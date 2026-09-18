@@ -1,0 +1,87 @@
+{% extends 'admin/model/list.html' %}
+
+{# Adds a page heading above the stock Flask-Admin list toolbar so these
+   views match the custom dashboard/manage pages. Wired via list_template
+   on SecureModelView. #}
+{% block body %}
+    <div class="list-page-head">
+        <h1>{{ admin_view.name }}</h1>
+        {% if count is defined and count is not none %}
+            <span class="list-page-count">{{ count }} total</span>
+        {% endif %}
+    </div>
+    {{ super() }}
+{% endblock %}
+
+{% block tail %}
+    {{ super() }}
+    {# Active/Featured toggles in the course list (.flag-toggle buttons) #}
+    <style>
+    .flag-toggle {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        margin: 0;
+        padding: 3px 5px;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .flag-toggle:hover {
+        background: rgba(0, 0, 0, 0.07);
+        transform: scale(1.12);
+    }
+    .flag-toggle:focus { outline: none; }
+    .flag-toggle:focus-visible { outline: 2px solid #29ABE2; outline-offset: 1px; }
+    </style>
+    <script>
+    (function () {
+        var ICON_ON = 'fa fa-check-circle glyphicon glyphicon-ok-circle icon-ok-circle';
+        var ICON_OFF = 'fa fa-minus-circle glyphicon glyphicon-minus-sign icon-minus-sign';
+
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.flag-toggle');
+            if (!btn) return;
+            var field = btn.getAttribute('data-field');
+            var isOn = btn.getAttribute('data-value') === '1';
+            var title = btn.getAttribute('data-title') || 'this course';
+            var msg;
+            if (field === 'is_active') {
+                msg = isOn
+                    ? 'Hide "' + title + '" from the website? Visitors will no longer see it.'
+                    : 'Publish "' + title + '" on the website? It will become visible to visitors.';
+            } else {
+                msg = isOn
+                    ? 'Remove "' + title + '" from featured courses?'
+                    : 'Feature "' + title + '"? It will be highlighted on the homepage.';
+            }
+            window.showConfirm(msg, function () {
+                fetch(btn.getAttribute('data-url'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ id: btn.getAttribute('data-id'), field: field })
+                })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        if (d.success) {
+                            btn.setAttribute('data-value', d.value ? '1' : '0');
+                            btn.querySelector('span').className = d.value ? ICON_ON : ICON_OFF;
+                        } else {
+                            window.showConfirm('Save failed: ' + (d.error || 'unknown error'), function () {});
+                        }
+                    })
+                    .catch(function (err) {
+                        window.showConfirm('Save failed: ' + err.message, function () {});
+                    });
+            });
+        });
+    })();
+    </script>
+{% endblock %}

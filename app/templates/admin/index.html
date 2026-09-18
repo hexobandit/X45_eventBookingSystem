@@ -1,0 +1,183 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="dash-head">
+    <div>
+        <h1>Hello, {{ current_user.first_name or current_user.full_name }} 👋</h1>
+        <p class="subtitle">Website overview and content management</p>
+    </div>
+    <div class="dash-head-actions">
+        <a href="{{ url_for('admin_events.visual_edit_view') }}" class="btn btn-brand">+ New Course</a>
+        <a href="{{ url_for('admin_events.index_view') }}" class="btn btn-brand-outline">Courses</a>
+        <a href="{{ url_for('admin_registrations.index_view') }}" class="btn btn-brand-outline">Registrations</a>
+        <a href="{{ url_for('admin_users.index_view') }}" class="btn btn-brand-outline">Users</a>
+        <a href="{{ url_for('main.index') }}" class="btn btn-brand-outline" target="_blank">View Website &nearr;</a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <a class="stat-card" href="{{ url_for('admin_events.index_view') }}">
+        <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="stat-number">{{ total_events }}</div>
+        <p class="stat-label">Courses &middot; {{ active_events }} active</p>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin_registrations.index_view') }}">
+        <div class="stat-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="stat-number">{{ total_registrations }}</div>
+        <p class="stat-label">Registrations</p>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin_registrations.index_view') }}?flt1_0=PENDING">
+        <div class="stat-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stat-number">{{ pending_registrations }}</div>
+        <p class="stat-label">Pending confirmation</p>
+    </a>
+    <a class="stat-card" href="{{ url_for('admin_registrations.index_view') }}">
+        <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="stat-number">{{ unpaid_registrations }}</div>
+        <p class="stat-label">Unpaid</p>
+    </a>
+</div>
+
+{% if attention %}
+<!-- Needs attention -->
+<div class="dash-card attention-card">
+    <div class="dash-card-header">
+        <h5>Needs attention</h5>
+        <span class="attention-count">{{ attention|length }}</span>
+    </div>
+    <ul class="attention-list">
+        {% for item in attention %}
+        <li>
+            <a href="{{ item.url }}">
+                <span class="attention-dot attention-{{ item.kind }}"></span>
+                <span class="attention-text">{{ item.text }}</span>
+                <span class="attention-detail">{{ item.detail }}</span>
+                <span class="attention-arrow">&rarr;</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Main Grid -->
+<div class="dashboard-grid">
+    <!-- Recent Registrations -->
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Recent registrations</h5>
+            <a href="{{ url_for('admin_registrations.index_view') }}">View all &rarr;</a>
+        </div>
+        <div class="dash-card-body">
+            {% if recent_registrations %}
+            <table class="reg-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>When</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in recent_registrations %}
+                    <tr>
+                        <td class="name-cell"><a href="{{ url_for('admin_registrations.edit_view', id=reg.id) }}">{{ reg.full_name }}</a></td>
+                        <td><a href="{{ url_for('admin_events.details_view', id=reg.event.id) }}">{{ reg.event.title[:35] }}{% if reg.event.title|length > 35 %}...{% endif %}</a></td>
+                        <td title="{{ reg.created_at.strftime('%d.%m.%Y %H:%M') }}">{{ reg.created_at|time_ago }}</td>
+                        <td>
+                            {% if reg.status.value == 'pending' %}
+                                <span class="badge-status badge-pending">&#9679; Pending</span>
+                            {% elif reg.status.value == 'confirmed' %}
+                                <span class="badge-status badge-confirmed">&#10003; Confirmed</span>
+                            {% elif reg.status.value == 'cancelled' %}
+                                <span class="badge-status badge-cancelled">&#10005; Cancelled</span>
+                            {% elif reg.status.value == 'waitlist' %}
+                                <span class="badge-status badge-waitlist">Waiting list</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reg.payment_status.name == 'PAID' %}
+                                <span class="badge-status badge-confirmed">Paid</span>
+                                {% include 'admin/_payment_method_badge.html' %}
+                            {% elif reg.payment_status.name == 'REFUNDED' %}
+                                <span class="badge-status badge-cancelled">Refunded</span>
+                            {% elif reg.status.value != 'cancelled' %}
+                                <span class="badge-status badge-pending">Unpaid</span>
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>No registrations yet.</p>
+                <a href="{{ url_for('admin_events.index_view') }}" class="btn btn-brand-outline btn-sm">Check your courses</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Upcoming courses</h5>
+            <a href="{{ url_for('admin_events.index_view') }}">View all &rarr;</a>
+        </div>
+        <div class="dash-card-body">
+            {% if upcoming_events %}
+                {% for event in upcoming_events %}
+                <div class="event-mini">
+                    <a href="{{ url_for('admin_events.details_view', id=event.id) }}" class="event-mini-link">
+                        <div class="event-mini-date">
+                            <div class="day">{{ event.event_date.strftime('%d') }}</div>
+                            <div class="month">{{ event.event_date.strftime('%m/%Y') }}</div>
+                        </div>
+                        <div class="event-mini-info">
+                            <h6>{{ event.title }}</h6>
+                            <p>
+                                {% set days_until = (event.event_date - now).days %}
+                                {% if days_until == 0 %}<strong>today</strong>{% elif days_until == 1 %}<strong>tomorrow</strong>{% else %}in {{ days_until }} days{% endif %}
+                                &middot; {{ event.location }} &middot; {{ event.event_type|capitalize }}
+                            </p>
+                        </div>
+                        <div class="event-mini-stats">
+                            <div class="count">{{ event.registered_count }}/{{ event.capacity }}</div>
+                            <div class="label">registrations</div>
+                            <div class="capacity-bar">
+                                {% set pct = (event.registered_count / event.capacity * 100) if event.capacity > 0 else 0 %}
+                                <div class="capacity-bar-fill{% if pct >= 90 %} full{% elif pct >= 70 %} warn{% endif %}" style="width: {{ pct }}%"></div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('admin_events.manage_view', id=event.id) }}" class="btn-brand-outline event-mini-manage">Manage</a>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <p>No upcoming events.</p>
+                <a href="{{ url_for('admin_events.visual_edit_view') }}" class="btn btn-brand btn-sm">+ New Course</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<p class="dash-footnote">
+    {{ total_spam }} spam submission{{ 's' if total_spam != 1 }} blocked
+    &middot; <a href="{{ url_for('admin_spam_log.index_view') }}">View spam log</a>
+</p>
+{% endblock %}

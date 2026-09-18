@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}About | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ site_description }}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <span class="eyebrow">About</span>
+    <h1>Two photographers, one studio</h1>
+    <p class="lead">{{ site_tagline }}</p>
+</header>
+
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="container-narrow reveal" style="text-align: center; margin-bottom: var(--sp-16);">
+            <p>We started {{ site_name }} after years of answering the same questions from colleagues: how do you light this, why does that flash look flat, what would you do with one softbox and a white wall. The answers were always easier to show than to write.</p>
+            <p>So we built a studio where we can show them. Every course here is taught on real equipment, with real subjects, in groups small enough that nobody waits for a turn.</p>
+        </div>
+
+        <div class="about-authors">
+            {% for author in site_authors %}
+            <div class="about-author reveal">
+                <div class="author-bio">
+                    <h2>{{ author }}</h2>
+                    <span class="role">Photographer · Lecturer</span>
+                    {% if loop.index == 1 %}
+                    <p class="bio-lead">Twelve years of commercial and editorial studio work.</p>
+                    <p>Portraits, product and food for agencies and magazines, and since 2019 a steady stream of assistants who wanted to know how the pictures were made. Teaches the lighting and portrait sessions.</p>
+                    {% else %}
+                    <p class="bio-lead">Started with a borrowed camera and a single desk lamp.</p>
+                    <p>Self-taught, then formally trained, then back to teaching the self-taught. Runs the equipment side of the studio and leads the workflow, colour and retouching sessions.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section cta-strip">
+    <div class="container">
+        <span class="eyebrow">Learn with us</span>
+        <h2 style="margin-bottom: var(--sp-6);">Join a course</h2>
+        <p>Small groups and hands-on work — the way we would want to learn ourselves.</p>
+        <a href="{{ url_for('main.courses') }}" class="btn btn-primary">View courses</a>
+    </div>
+</section>
+{% endblock %}

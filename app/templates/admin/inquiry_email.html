@@ -1,0 +1,65 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<h1>Batch email</h1>
+<p class="subtitle">Send one message to the notify list, book-order interests, or general inquiries — for example the new-book launch announcement.</p>
+
+<form method="POST" class="settings-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Recipients</h5>
+        </div>
+        <div class="dash-card-body">
+            <div class="form-check-row">
+                <label class="form-check-label">
+                    <input type="checkbox" name="recipient_types" value="book_notify" checked>
+                    Notify list ({{ counts.get('book_notify', 0) }})
+                </label>
+            </div>
+            <div class="form-check-row">
+                <label class="form-check-label">
+                    <input type="checkbox" name="recipient_types" value="book_order">
+                    Book order interests ({{ counts.get('book_order', 0) }})
+                </label>
+            </div>
+            <div class="form-check-row">
+                <label class="form-check-label">
+                    <input type="checkbox" name="recipient_types" value="contact">
+                    General inquiries ({{ counts.get('contact', 0) }})
+                </label>
+            </div>
+            <small class="form-hint">Duplicate email addresses across lists receive the message only once.</small>
+        </div>
+    </div>
+
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Message</h5>
+        </div>
+        <div class="dash-card-body">
+            <div class="form-row">
+                <div class="form-group form-group-wide">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" class="form-control"
+                           placeholder="News from {{ site_name }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group form-group-wide">
+                    <label for="message">Message (HTML allowed)</label>
+                    <textarea id="message" name="message" class="form-control" rows="10"
+                              placeholder="<p>Dear colleagues,</p>"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-actions">
+        <button type="submit" name="action" value="send" class="btn btn-brand"
+                onclick="return confirm('Send this email to all selected recipients?');">Send to recipients</button>
+        <button type="submit" name="action" value="test" class="btn btn-brand-outline">Send test to admin email</button>
+    </div>
+</form>
+{% endblock %}

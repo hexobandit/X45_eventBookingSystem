@@ -1,0 +1,141 @@
+/* ==========================================================================
+   Base — reset, typography, focus, motion
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--text-secondary);
+    background-color: var(--bg-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 200;
+    color: var(--text-primary);
+    line-height: 1.25;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-display);
+}
+
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); letter-spacing: 0.16em; }
+
+p {
+    margin-bottom: var(--sp-4);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--accent-bright);
+}
+
+strong {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+ul, ol {
+    padding-left: 1.25rem;
+    margin-bottom: var(--sp-4);
+}
+
+li {
+    margin-bottom: var(--sp-2);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+::selection {
+    background: var(--accent-deep);
+    color: var(--text-primary);
+}
+
+/* Visible keyboard focus — blue hairline */
+:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 3px;
+}
+
+/* Eyebrow label — the quiet uppercase marker used across the site */
+.eyebrow {
+    display: block;
+    font-family: var(--font-body);
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-4);
+}
+
+/* Hairline rules — the E|A|E vertical made horizontal */
+.rule {
+    border: 0;
+    height: 1px;
+    background: var(--border-accent);
+    width: 4rem;
+    margin: var(--sp-6) 0;
+}
+
+.rule--center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Scroll reveal (JS adds .is-visible; motion off = always visible) */
+.reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+                transform 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .reveal {
+        opacity: 1;
+        transform: none;
+    }
+}

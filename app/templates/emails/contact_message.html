@@ -1,0 +1,40 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Contact form - {{ subject or 'General inquiry' }}{% endblock %}
+
+{% block content %}
+<h2>New message from the contact form</h2>
+
+<div class="event-details">
+    <h3>Sender</h3>
+    <div class="detail-row">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value">{{ name }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Email:</span>
+        <span class="detail-value"><a href="mailto:{{ email }}">{{ email }}</a></span>
+    </div>
+    {% if phone %}
+    <div class="detail-row">
+        <span class="detail-label">Phone:</span>
+        <span class="detail-value">{{ phone }}</span>
+    </div>
+    {% endif %}
+    {% if subject %}
+    <div class="detail-row">
+        <span class="detail-label">Subject:</span>
+        <span class="detail-value">{{ subject }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<div class="event-details">
+    <h3>Message</h3>
+    <p style="white-space: pre-wrap;">{{ message }}</p>
+</div>
+
+<p style="text-align: center;">
+    <a href="mailto:{{ email }}" class="btn">Reply</a>
+</p>
+{% endblock %}

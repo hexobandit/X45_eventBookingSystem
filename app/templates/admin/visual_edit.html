@@ -1,0 +1,361 @@
+{% extends "admin/master.html" %}
+
+{% block title %}Visual Editor{% if event %} - {{ event.title }}{% endif %}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_v }}">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div class="ve-header">
+    <div class="ve-header-left">
+        <a href="{{ return_url }}" class="ve-back-btn">&larr; Back</a>
+        <h1 class="ve-header-title">{% if event %}Edit course{% else %}New course{% endif %}</h1>
+    </div>
+    <div class="ve-header-right">
+        <span class="ve-save-status" id="saveStatus"></span>
+        <button type="button" class="ve-save-btn" id="saveBtn">Save</button>
+        <a href="{{ url_for('main.course_detail', slug=event.slug) if event else '#' }}" target="_blank" class="ve-view-btn" id="viewSiteBtn" {% if not event %}style="display:none"{% endif %}>View on website</a>
+    </div>
+</div>
+
+<!-- Mobile tab switcher -->
+<div class="ve-tab-switcher" id="tabSwitcher">
+    <button class="ve-tab active" data-tab="form">Form</button>
+    <button class="ve-tab" data-tab="preview">Preview</button>
+</div>
+
+<div class="ve-container">
+    <!-- FORM PANEL -->
+    <div class="ve-form-panel" id="formPanel">
+
+        <!-- Writing guide / AI prompt -->
+        <details class="ve-guide" {% if not event %}open{% endif %}>
+            <summary class="ve-guide-summary">&#128161; How to write a good course page <span class="ve-guide-hint">(tips + AI prompt to copy)</span></summary>
+            <div class="ve-guide-body">
+                <ul class="ve-guide-tips">
+                    <li><strong>Title</strong> — short and concrete (max ~60 characters), no marketing fluff.</li>
+                    <li><strong>Short description</strong> — plain text, max 300 characters; this is what shows on the course card.</li>
+                    <li><strong>Description</strong> — 3–5 short paragraphs; paste from Word/Docs is fine, formatting is cleaned automatically.</li>
+                    <li><strong>Program</strong> — day-by-day bullet lists; <strong>What you'll learn</strong> — 5–8 bullets, each starting with a verb.</li>
+                    <li><strong>Image</strong> — landscape, at least 1600px wide; adjust crop with the position slider.</li>
+                </ul>
+                <p class="ve-guide-copy-label">Writing with an AI assistant? Copy this prompt, fill in the course facts at the bottom, and paste it to your AI:</p>
+                <textarea class="ve-guide-prompt" id="aiPromptText" readonly rows="10">You are helping me write content for a course page on the {{ site_name }} website. Write in clear, professional English. Use only simple HTML: &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt; — no styles, no headings.
+
+Produce these fields, clearly labeled:
+
+1. TITLE — max 60 characters, concrete, no fluff.
+2. SHORT DESCRIPTION — plain text, max 300 characters, enticing summary for a preview card.
+3. DESCRIPTION — 3–5 short paragraphs: what the course is, the teaching approach, why to attend.
+4. PROGRAM — agenda as bullet lists, grouped by day (Day 1, Day 2...).
+5. WHAT YOU'LL LEARN — 5–8 bullets, each starting with an action verb.
+6. WHO IT'S FOR — 2–4 bullets describing the target audience.
+7. WHAT'S INCLUDED — bullets (materials, meals, certificate, etc.).
+8. LECTURERS — for each: name + one-line role.
+
+Course facts (I fill these in):
+- Topic:
+- Date(s) and duration:
+- Location / venue:
+- Lecturer(s):
+- Level / audience:
+- Price and what it covers:
+- Capacity:
+- Anything special:</textarea>
+                <button type="button" class="ve-guide-copy-btn" id="copyPromptBtn">Copy prompt</button>
+            </div>
+        </details>
+
+        <!-- Basic Info -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Basic information</h3>
+            <div class="ve-field">
+                <label for="ve-title">Course title *</label>
+                <input type="text" id="ve-title" class="ve-input" value="{{ event.title if event else '' }}" placeholder="Aesthetics in everyday practice">
+            </div>
+            {% if event and event.slug %}
+            <div class="ve-field">
+                <label for="ve-slug">URL slug</label>
+                <input type="text" id="ve-slug" class="ve-input" value="{{ event.slug }}" style="font-family: monospace; font-size: 0.82rem; color: var(--admin-text-muted);">
+            </div>
+            {% endif %}
+            <div class="ve-row">
+                <div class="ve-field">
+                    <label for="ve-event_date">Date *</label>
+                    <input type="datetime-local" id="ve-event_date" class="ve-input" value="{{ event.event_date.strftime('%Y-%m-%dT%H:%M') if event and event.event_date else '' }}">
+                </div>
+                <div class="ve-field">
+                    <label for="ve-end_date">End date</label>
+                    <input type="datetime-local" id="ve-end_date" class="ve-input" value="{{ event.end_date.strftime('%Y-%m-%dT%H:%M') if event and event.end_date else '' }}">
+                </div>
+            </div>
+            <div class="ve-row">
+                <div class="ve-field">
+                    <label for="ve-location">Location *</label>
+                    <input type="text" id="ve-location" class="ve-input" value="{{ event.location if event else '' }}" placeholder="Prague">
+                </div>
+                <div class="ve-field">
+                    <label for="ve-venue_name">Venue name</label>
+                    <input type="text" id="ve-venue_name" class="ve-input" value="{{ event.venue_name if event else '' }}" placeholder="Dental clinic / venue name">
+                </div>
+            </div>
+        </div>
+
+        <!-- Image -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Course image</h3>
+            <div class="ve-dropzone" id="heroDropzone">
+                {% if event and event.image_url %}
+                <img src="{{ event.image_url }}" class="ve-dropzone-preview" id="heroDropzonePreview">
+                {% else %}
+                <div class="ve-dropzone-placeholder" id="heroDropzonePlaceholder">
+                    <span class="ve-dropzone-icon">&#128247;</span>
+                    <span>Drag an image here or click to upload</span>
+                </div>
+                <img src="" class="ve-dropzone-preview" id="heroDropzonePreview" style="display:none">
+                {% endif %}
+                <input type="file" id="heroFileInput" accept="image/*" style="display:none">
+            </div>
+            <div class="ve-field" style="margin-top: 12px">
+                <label for="ve-image_position_y">Image position (vertical)</label>
+                <div class="ve-slider-row">
+                    <span class="ve-slider-label">Top</span>
+                    <input type="range" id="ve-image_position_y" class="ve-range" min="0" max="100" value="{{ event.image_position_y|default(50) if event else 50 }}">
+                    <span class="ve-slider-label">Bottom</span>
+                </div>
+            </div>
+
+            <h3 class="ve-section-title" style="margin-top: 20px">Course body image</h3>
+            <div class="ve-dropzone ve-dropzone-small" id="bodyDropzone">
+                {% if event and event.body_image_url %}
+                <img src="{{ event.body_image_url }}" class="ve-dropzone-preview" id="bodyDropzonePreview">
+                {% else %}
+                <div class="ve-dropzone-placeholder" id="bodyDropzonePlaceholder">
+                    <span class="ve-dropzone-icon">&#128247;</span>
+                    <span>Drag here or click</span>
+                </div>
+                <img src="" class="ve-dropzone-preview" id="bodyDropzonePreview" style="display:none">
+                {% endif %}
+                <input type="file" id="bodyFileInput" accept="image/*" style="display:none">
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Content</h3>
+            <div class="ve-field">
+                <label for="ve-short_description">Short description <small>(max 300 characters)</small></label>
+                <textarea id="ve-short_description" class="ve-textarea" rows="3" maxlength="300" placeholder="Description for the card preview...">{{ event.short_description if event else '' }}</textarea>
+                <span class="ve-char-count" id="shortDescCount">0/300</span>
+            </div>
+            <div class="ve-field">
+                <label for="ve-description">Course description</label>
+                <textarea id="ve-description" class="ve-textarea ve-summernote" rows="8" placeholder="<p>Detailed course description...</p>">{{ event.description if event else '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Lecturers -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Lecturers</h3>
+            <div id="lecturersList"></div>
+            <button type="button" class="ve-add-btn" id="addLecturerBtn">+ Add lecturer</button>
+        </div>
+
+        <!-- Program / Learn / Audience -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Details</h3>
+            <div class="ve-field">
+                <label for="ve-program">Program</label>
+                <textarea id="ve-program" class="ve-textarea ve-summernote" rows="6">{{ event.program if event else '' }}</textarea>
+            </div>
+            <div class="ve-field">
+                <label for="ve-what_you_learn">What you'll learn</label>
+                <textarea id="ve-what_you_learn" class="ve-textarea ve-summernote" rows="6">{{ event.what_you_learn if event else '' }}</textarea>
+            </div>
+            <div class="ve-field">
+                <label for="ve-target_audience">Who it's for</label>
+                <textarea id="ve-target_audience" class="ve-textarea ve-summernote" rows="4">{{ event.target_audience if event else '' }}</textarea>
+            </div>
+            <div class="ve-field">
+                <label>Included in the price</label>
+                <div id="includesList"></div>
+                <button type="button" class="ve-add-btn" id="addIncludeBtn">+ Add item</button>
+                <input type="hidden" id="includesData" value="{{ event.includes|e if event and event.includes else '' }}">
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="ve-section">
+            <h3 class="ve-section-title">Settings</h3>
+            <div class="ve-row">
+                <div class="ve-field">
+                    <label for="ve-event_type">Type</label>
+                    <select id="ve-event_type" class="ve-select">
+                        <option value="workshop" {{ 'selected' if not event or event.event_type == 'workshop' }}>Workshop</option>
+                        <option value="seminar" {{ 'selected' if event and event.event_type == 'seminar' }}>Seminar</option>
+                        <option value="course" {{ 'selected' if event and event.event_type == 'course' }}>Course</option>
+                        <option value="conference" {{ 'selected' if event and event.event_type == 'conference' }}>Conference</option>
+                    </select>
+                </div>
+                <div class="ve-field">
+                    <label for="ve-event_category">Category <small>(not used yet — reserved for future notification routing)</small></label>
+                    <select id="ve-event_category" class="ve-select" disabled title="Not used yet — all notifications go to the addresses in Email settings">
+                        <option value="client" {{ 'selected' if not event or event.event_category == 'client' }}>Clients</option>
+                        <option value="doctor" {{ 'selected' if event and event.event_category == 'doctor' }}>Dentists</option>
+                    </select>
+                </div>
+            </div>
+            <div class="ve-row">
+                <div class="ve-field">
+                    <label for="ve-capacity">Capacity</label>
+                    <input type="number" id="ve-capacity" class="ve-input" value="{{ event.capacity if event else 12 }}" min="1">
+                </div>
+                <div class="ve-field">
+                    <label for="ve-price">Price</label>
+                    <div class="ve-price-row">
+                        <input type="number" id="ve-price" class="ve-input" value="{{ event.price if event and event.price else '' }}" placeholder="On request">
+                        <select id="ve-currency" class="ve-select ve-currency-select">
+                            {% for cur in currencies %}
+                            <option value="{{ cur }}" {{ 'selected' if (event.currency if event else 'EUR') == cur }}>{{ cur }}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="ve-toggle ve-vat-toggle" title="Show 'incl. VAT' next to the price">
+                            <input type="checkbox" id="ve-price_includes_vat" {{ 'checked' if event and event.price_includes_vat }}>
+                            <span>incl. VAT</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="ve-field">
+                <label for="ve-price_note">Price note</label>
+                <input type="text" id="ve-price_note" class="ve-input" value="{{ event.price_note if event else '' }}" placeholder="early bird, student discount...">
+            </div>
+            <div class="ve-note">
+                <span class="ve-note-icon">&#8505;</span>
+                <div>
+                    <strong>Payment details are managed separately.</strong>
+                    Bank account, IBAN / SEPA, variable symbol, QR codes and the Stripe card option are set in the course's
+                    <strong>Manage</strong> panel (Courses &rarr; course &rarr; Manage course &rarr; Payment details), not here.
+                    The price above is only what visitors see on the course page.
+                    {% if event %}<a href="{{ url_for('admin_events.manage_view', id=event.id) }}">Open payment details &rarr;</a>
+                    {% else %}Save the course first, then open its Manage panel.{% endif %}
+                </div>
+            </div>
+            <div class="ve-toggles">
+                <label class="ve-toggle">
+                    <input type="checkbox" id="ve-is_active" {{ 'checked' if not event or event.is_active }}>
+                    <span>Active</span>
+                </label>
+                {# Featured — placeholder for a future "highlighted courses" feature
+                <label class="ve-toggle">
+                    <input type="checkbox" id="ve-is_featured" {{ 'checked' if event and event.is_featured }}>
+                    <span>Featured</span>
+                </label>
+                #}
+                <label class="ve-toggle">
+                    <input type="checkbox" id="ve-registration_open" {{ 'checked' if not event or event.registration_open }}>
+                    <span>Registration open</span>
+                </label>
+            </div>
+            <div class="ve-field" style="margin-top: 14px">
+                <label for="ve-registration_opens_at">Registration opens at <small>(leave empty to open immediately)</small></label>
+                <input type="datetime-local" id="ve-registration_opens_at" class="ve-input" value="{{ event.registration_opens_at.strftime('%Y-%m-%dT%H:%M') if event and event.registration_opens_at else '' }}">
+                <small id="regOpensStatus" style="display:block; margin-top:4px; font-size:0.78rem;"></small>
+            </div>
+            <div class="ve-field" style="margin-top: 14px">
+                <label for="ve-external_registration_url">External registration (URL) <small>(leave empty for internal registration)</small></label>
+                <input type="url" id="ve-external_registration_url" class="ve-input" value="{{ event.external_registration_url or '' }}" placeholder="https://patakovo.cz/...">
+                <small style="display:block; margin-top:4px; font-size:0.78rem; color: var(--admin-text-muted, #888);">If filled in, registration takes place on the external page and the internal form is hidden.</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div class="ve-preview-panel" id="previewPanel">
+
+        <!-- Card Preview -->
+        <div class="ve-preview-block">
+            <h4 class="ve-preview-label">Course card</h4>
+            <div class="ve-card-preview-wrap">
+                <div class="ve-event-card">
+                    <div class="ve-event-card-image ve-image-drag-area" id="cardImageDrag">
+                        <img src="{{ event.image_url if event and event.image_url else '' }}"
+                             alt="" id="previewCardImage"
+                             style="object-position: center {{ event.image_position_y|default(50) if event else 50 }}%;{{ ' display:none' if not event or not event.image_url }}"
+                        >
+                        <div class="ve-drag-hint" id="dragHint">&#8597; Drag to adjust position</div>
+                    </div>
+                    <div class="ve-event-card-content">
+                        <div class="ve-event-card-date">
+                            <span class="ve-day" id="previewDay">{{ event.event_date.strftime('%d') if event and event.event_date else '--' }}</span>
+                            <span class="ve-month" id="previewMonth">{{ event.event_date.strftime('%B') if event and event.event_date else '---' }}</span>
+                        </div>
+                        <h3 id="previewTitle">{{ event.title if event else 'Course title' }}</h3>
+                        <p class="ve-event-location" id="previewLocation">{{ event.location if event else 'Location' }}</p>
+                        <p class="ve-event-description" id="previewDesc">{{ event.short_description if event and event.short_description else 'Short course description...' }}</p>
+                        <span class="ve-event-card-link">More information &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Preview -->
+        <div class="ve-preview-block">
+            <h4 class="ve-preview-label">Hero section</h4>
+            <div class="ve-hero-preview-wrap">
+                <div class="ve-event-hero" id="heroPreview">
+                    <div class="ve-event-hero-image" id="heroImageWrap">
+                        <img src="{{ event.image_url if event and event.image_url else '' }}"
+                             alt="" id="previewHeroImage"
+                             style="object-position: center {{ event.image_position_y|default(50) if event else 50 }}%;{{ ' display:none' if not event or not event.image_url }}"
+                        >
+                    </div>
+                    <div class="ve-event-hero-content">
+                        <div class="ve-event-meta">
+                            <span class="ve-event-type" id="previewType">{{ event.event_type|capitalize if event else 'Workshop' }}</span>
+                            <span class="ve-event-date-full" id="previewDateFull">{{ event.formatted_date if event else '' }}</span>
+                        </div>
+                        <h1 id="previewHeroTitle">{{ event.title if event else 'Course title' }}</h1>
+                        <p class="ve-event-location-full" id="previewHeroLocation">{{ event.location if event else 'Location' }}{% if event and event.venue_name %} | {{ event.venue_name }}{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Page Preview -->
+        <div class="ve-preview-block">
+            <h4 class="ve-preview-label">Full page
+                <span class="ve-preview-label-note" id="fullPreviewNote">{% if not event %}(save the course first){% else %}(reflects last saved version){% endif %}</span>
+            </h4>
+            <div class="ve-full-preview-wrap" id="fullPreviewWrap">
+                <iframe id="fullPreviewFrame" class="ve-full-preview-frame" title="Full page preview"
+                        {% if event %}src="{{ url_for('main.course_detail', slug=event.slug) }}"{% endif %}></iframe>
+                {% if not event %}
+                <div class="ve-full-preview-empty" id="fullPreviewEmpty">The full page preview appears after the first save.</div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Hidden data -->
+<input type="hidden" id="eventId" value="{{ event.id if event else '' }}">
+<input type="hidden" id="eventSlug" value="{{ event.slug if event else '' }}">
+<input type="hidden" id="coursesBaseUrl" value="{{ url_for('main.courses') }}">
+<input type="hidden" id="csrfToken" value="{{ csrf_token() }}">
+<input type="hidden" id="heroImageUrl" value="{{ event.image_url if event and event.image_url else '' }}">
+<input type="hidden" id="bodyImageUrl" value="{{ event.body_image_url if event and event.body_image_url else '' }}">
+<input type="hidden" id="saveEndpoint" value="{{ url_for('admin_events.visual_edit_save') }}">
+<input type="hidden" id="uploadEndpoint" value="{{ url_for('admin_events.visual_edit_upload_image') }}">
+<input type="hidden" id="lecturersData" value="{{ event.lecturers|default('[]')|e if event else '[]' }}">
+{% endblock %}
+
+{% block tail %}
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-cs-CZ.min.js"></script>
+<script src="{{ url_for('static', filename='js/visual-edit.js') }}?v={{ asset_v }}"></script>
+{% endblock %}

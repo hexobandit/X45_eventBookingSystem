@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | {{ site_name }}{% endblock %}
+{% block meta_description %}Get in touch with {{ site_name }} — questions about courses or cooperation.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <span class="eyebrow">Contact</span>
+    <h1>Write to us</h1>
+    <p class="lead">A question about a course, or working together? We read everything ourselves.</p>
+</header>
+
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-form-wrapper">
+                <form class="contact-form" action="{{ url_for('main.contact') }}" method="post" novalidate data-wait="Sending your message">
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" name="_form_token" value="{{ form_token }}">
+                    <input type="hidden" name="_js_check" value="">
+                    <!-- anti-spam honeypot -->
+                    <div style="position:absolute;left:-9999px;" aria-hidden="true">
+                        <label for="website">Leave this empty</label>
+                        <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" value="">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">{{ form.name.label.text }} *</label>
+                            {{ form.name(class="form-control" ~ (" is-invalid" if form.name.errors else ""), placeholder="Your name") }}
+                            {% for err in form.name.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label for="email">{{ form.email.label.text }} *</label>
+                            {{ form.email(class="form-control" ~ (" is-invalid" if form.email.errors else ""), placeholder="you@example.com") }}
+                            {% for err in form.email.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">{{ form.phone.label.text }}</label>
+                        {{ form.phone(class="form-control" ~ (" is-invalid" if form.phone.errors else ""), placeholder="+420 123 456 789", type="tel") }}
+                        {% for err in form.phone.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">{{ form.subject.label.text }}</label>
+                        {{ form.subject(class="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">{{ form.message.label.text }} *</label>
+                        {{ form.message(class="form-control" ~ (" is-invalid" if form.message.errors else ""), rows="6") }}
+                        {% for err in form.message.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                    </div>
+
+                    <div class="form-group checkbox">
+                        {{ form.gdpr(class="form-check-input") }}
+                        <label for="gdpr">{{ form.gdpr.label.text }} * <a class="consent-link" href="{{ url_for('main.privacy') }}" target="_blank" rel="noopener">(privacy policy)</a></label>
+                        {% for err in form.gdpr.errors %}<span class="form-error">{{ err }}</span>{% endfor %}
+                    </div>
+
+                    <div class="form-group checkbox">
+                        {{ form.marketing(class="form-check-input") }}
+                        <label for="marketing">{{ form.marketing.label.text }}</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Send message</button>
+                </form>
+            </div>
+
+            <aside class="contact-aside">
+                <h3>{{ site_name }}</h3>
+                <p>{{ site_authors_line }}<br>{{ site_city }}</p>
+                <hr class="rule">
+                <p>You'll receive a copy of your message by email. We usually reply within a few days.</p>
+                {% if instagram_url %}<a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram &nearr;</a>{% endif %}
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    var f = document.querySelector('.contact-form');
+    if (f) f.querySelector('[name="_js_check"]').value = 'human';
+})();
+</script>
+{% endblock %}

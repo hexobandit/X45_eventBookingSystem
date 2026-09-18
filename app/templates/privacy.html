@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy policy | {{ site_name }}{% endblock %}
+{% block meta_description %}How {{ site_name }} handles personal data from course registrations and contact messages.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <span class="eyebrow">Privacy</span>
+    <h1>Privacy policy</h1>
+    <p class="lead">What we collect, why, for how long, and your rights. Written in plain language.</p>
+</header>
+
+<section class="section legal" style="padding-top: 0;">
+    <div class="container-narrow">
+        <p class="legal-updated">Last updated: {{ updated }}</p>
+
+        <h2>1. Who we are</h2>
+        <p>
+            The data controller is <strong>{{ site_name }}</strong> — {{ site_authors_line }},
+            {{ site_city }}.
+            {# TODO client: add the legal entity name, registered address and IČO here. #}
+        </p>
+        <p>
+            You can reach us through the <a href="{{ url_for('main.contact') }}">contact form</a>
+            or by replying to any email we send you.
+        </p>
+
+        <h2>2. What we collect and why</h2>
+
+        <h3>Course registration</h3>
+        <p>
+            When you register for a course we collect your name, email address, phone number
+            (optional), practice or clinic name (optional), your notes to us, and — if you ask for
+            an invoice — your company billing details. We use this to reserve your seat, send
+            confirmations, payment details, reminders and practical information about the course,
+            issue an invoice, and match your bank transfer to your registration.
+        </p>
+        <p>
+            <strong>Legal basis:</strong> performance of a contract (your registration) and our legal
+            obligations (accounting and tax records).
+        </p>
+
+        <h3>Payments</h3>
+        <p>
+            If you pay by card, the payment is processed by <strong>Stripe</strong>. Your card details
+            are entered on Stripe's secure page and never reach our servers; we only receive a
+            confirmation that the payment succeeded, the amount, and Stripe's reference number.
+            If you pay by bank transfer, we see the details your bank sends with the payment
+            (name, account number, variable symbol).
+        </p>
+
+        <h3>Contact form</h3>
+        <p>
+            When you write to us we keep your name, email address, phone
+            number (optional) and your message so that we can reply.
+            <strong>Legal basis:</strong> our legitimate interest in answering your request.
+        </p>
+
+        <h3>News about courses and publications</h3>
+        <p>
+            Only if you tick the optional box, we keep your name and email address to send you
+            occasional news about upcoming courses and publications. You can withdraw this consent
+            at any time — every message has an unsubscribe link, or simply write to us.
+            <strong>Legal basis:</strong> your consent.
+        </p>
+
+        <h3>Website analytics</h3>
+        <p>
+            We use <strong>Cloudflare Web Analytics</strong> and <strong>Google Analytics 4</strong> to
+            understand how the site is used (pages visited, approximate location, device type).
+            Google Analytics sets cookies; Cloudflare Web Analytics does not. We do not use
+            advertising cookies and we do not sell data.
+        </p>
+
+        <h2>3. Who else sees your data</h2>
+        <p>We share personal data only with providers we need to run the service:</p>
+        <ul>
+            <li><strong>Stripe</strong> — card payments (Stripe Payments Europe, Ltd., Ireland).</li>
+            <li><strong>Microsoft Azure</strong> — hosting of this website and its database (EU region).</li>
+            <li><strong>Our email provider</strong> — delivery of confirmations and other messages.</li>
+            <li><strong>Cloudflare</strong> and <strong>Google</strong> — website analytics as described above.</li>
+            <li><strong>Our accountant</strong> — invoices and payment records, as required by law.</li>
+        </ul>
+        <p>
+            Some of these providers may process data outside the European Economic Area. Where they
+            do, transfers are covered by the European Commission's standard contractual clauses or
+            an adequacy decision.
+        </p>
+
+        <h2>4. How long we keep it</h2>
+        <ul>
+            <li><strong>Course registrations</strong> — for the duration of the course and then as long as
+                accounting law requires us to keep invoices and payment records (currently 10 years
+                in the Czech Republic).</li>
+            <li><strong>Cancelled or deleted registrations</strong> — a record of the cancellation (name,
+                email, course, reason) for up to 3 years, so we can answer questions about refunds
+                and past bookings.</li>
+            <li><strong>Contact messages</strong> — up to 2 years after our last reply.</li>
+            <li><strong>Marketing consent</strong> — until you withdraw it.</li>
+            <li><strong>Analytics data</strong> — as set by Google Analytics (14 months) and Cloudflare.</li>
+        </ul>
+
+        <h2>5. Your rights</h2>
+        <p>Under the GDPR you can at any time:</p>
+        <ul>
+            <li>ask what personal data we hold about you and receive a copy;</li>
+            <li>have inaccurate data corrected;</li>
+            <li>have your data deleted, where we no longer need to keep it;</li>
+            <li>restrict or object to processing based on our legitimate interest;</li>
+            <li>withdraw consent to marketing emails;</li>
+            <li>receive your data in a portable format;</li>
+            <li>lodge a complaint with the Czech Office for Personal Data Protection
+                (<a href="https://uoou.gov.cz" target="_blank" rel="noopener noreferrer">uoou.gov.cz</a>)
+                or the authority in your own country.</li>
+        </ul>
+        <p>
+            To exercise any of these, use the <a href="{{ url_for('main.contact') }}">contact form</a>
+            or reply to one of our emails. We answer within one month.
+        </p>
+
+        <h2>6. Cookies</h2>
+        <p>
+            This site sets a session cookie needed for forms to work and for administrators to log
+            in, and Google Analytics cookies for statistics. No advertising or third-party tracking
+            cookies are used. You can block cookies in your browser settings; the site will still
+            work.
+        </p>
+
+        <h2>7. Changes</h2>
+        <p>
+            If we change this policy we will update the date at the top of this page. Substantial
+            changes affecting registered participants will also be announced by email.
+        </p>
+    </div>
+</section>
+{% endblock %}

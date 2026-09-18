@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Admin Settings - Email Configuration Form
+   ========================================================================== */
+
+.settings-form .dash-card-body {
+    padding: 18px 24px;
+}
+
+.settings-form .form-row {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.settings-form .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-form .form-group-wide {
+    flex: 2;
+}
+
+.settings-form .form-group-narrow {
+    flex: 0 0 120px;
+}
+
+.settings-form label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    margin-bottom: 0.35rem;
+}
+
+.settings-form .form-control {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.9rem;
+    background: var(--admin-bg-card);
+    transition: border-color 0.15s;
+}
+
+.settings-form .form-control:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+}
+
+.settings-form .form-hint {
+    font-size: 0.78rem;
+    color: var(--admin-text-muted);
+    margin-top: 0.3rem;
+}
+
+.form-check-row {
+    margin: 0.5rem 0 0.25rem;
+}
+
+.form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--admin-text-secondary);
+    cursor: pointer;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.email-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--admin-radius-pill);
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
+.email-badge-ok {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+}
+
+.email-badge-warn {
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
+}
+
+@media (max-width: 600px) {
+    .settings-form .form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .settings-form .form-group-narrow {
+        flex: 1;
+    }
+
+    .settings-actions {
+        flex-direction: column;
+    }
+}

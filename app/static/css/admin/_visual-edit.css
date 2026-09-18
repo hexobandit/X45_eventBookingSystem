@@ -1,0 +1,925 @@
+/* ==========================================================================
+   Visual Editor - WYSIWYG Event Editor
+   ========================================================================== */
+
+/* --- Header Bar --- */
+.ve-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--admin-bg-card);
+    border-bottom: 1px solid var(--admin-border-medium);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.ve-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+}
+
+.ve-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.ve-back-btn {
+    font-size: 0.85rem;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: var(--admin-radius-xs);
+    border: 1px solid var(--admin-border-medium);
+    white-space: nowrap;
+}
+
+.ve-back-btn:hover {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text);
+    text-decoration: none;
+}
+
+.ve-header-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ve-save-status {
+    font-size: 0.82rem;
+    color: var(--admin-text-muted);
+    white-space: nowrap;
+}
+
+.ve-save-status.saving { color: var(--admin-accent); }
+.ve-save-status.saved { color: var(--status-confirmed-text); }
+.ve-save-status.error { color: var(--accent-red); }
+
+.ve-save-btn {
+    padding: 8px 20px;
+    background: var(--admin-accent);
+    color: var(--admin-primary);
+    border: none;
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.ve-save-btn:hover {
+    background: var(--admin-accent-bright);
+}
+
+.ve-view-btn {
+    padding: 7px 14px;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.82rem;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ve-view-btn:hover {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text);
+    text-decoration: none;
+}
+
+/* --- Mobile Tab Switcher --- */
+.ve-tab-switcher {
+    display: none;
+    padding: 8px 16px;
+    background: var(--admin-bg-card);
+    border-bottom: 1px solid var(--admin-border-medium);
+    gap: 4px;
+}
+
+.ve-tab {
+    flex: 1;
+    padding: 8px 16px;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-xs);
+    background: transparent;
+    font-size: 0.85rem;
+    color: var(--admin-text-secondary);
+    cursor: pointer;
+    text-align: center;
+}
+
+.ve-tab.active {
+    background: var(--admin-primary);
+    color: #fff;
+    border-color: var(--admin-primary);
+}
+
+/* --- Container --- */
+.ve-container {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+}
+
+/* --- Form Panel --- */
+.ve-form-panel {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(100vh - 60px);
+}
+
+.ve-section {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--admin-border);
+}
+
+.ve-section-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--admin-border-light);
+}
+
+.ve-field {
+    margin-bottom: 14px;
+}
+
+.ve-field:last-child {
+    margin-bottom: 0;
+}
+
+.ve-field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--admin-text-secondary);
+    margin-bottom: 5px;
+}
+
+.ve-field label small {
+    font-weight: 400;
+    color: var(--admin-text-muted);
+}
+
+.ve-input,
+.ve-select,
+.ve-textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.88rem;
+    color: var(--admin-text);
+    background: var(--admin-bg-card);
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.ve-input-error {
+    border-color: var(--accent-red) !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15) !important;
+    animation: ve-shake 0.3s ease;
+}
+
+@keyframes ve-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.ve-input:focus,
+.ve-select:focus,
+.ve-textarea:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.15);
+}
+
+.ve-textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.ve-textarea.ve-html {
+    font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.ve-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.ve-row .ve-field {
+    margin-bottom: 0;
+}
+
+.ve-char-count {
+    display: block;
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+    margin-top: 4px;
+}
+
+/* Toggles */
+.ve-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.ve-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--admin-text-secondary);
+}
+
+.ve-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--admin-primary);
+}
+
+/* --- Summernote overrides --- */
+.ve-section .note-editor {
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    overflow: hidden;
+}
+
+.ve-section .note-editor .note-toolbar {
+    background: var(--admin-bg-subtle);
+    border-bottom: 1px solid var(--admin-border-light);
+    padding: 4px 8px;
+}
+
+.ve-section .note-editor .note-editing-area .note-editable {
+    font-size: 0.88rem;
+    color: var(--admin-text);
+    padding: 10px 12px;
+}
+
+.ve-section .note-editor .note-statusbar {
+    display: none;
+}
+
+/* --- Lecturers repeater --- */
+.ve-lecturer-row {
+    position: relative;
+    padding: 12px 36px 4px 0;
+    border-bottom: 1px solid var(--admin-border-light);
+    margin-bottom: 8px;
+}
+
+.ve-lecturer-row:last-child {
+    border-bottom: none;
+}
+
+.ve-lecturer-remove {
+    position: absolute;
+    top: 14px;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    color: var(--admin-text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ve-lecturer-remove:hover {
+    background: var(--status-cancelled-bg);
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.ve-add-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: none;
+    border: 1px dashed var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    color: var(--admin-accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.ve-add-btn:hover {
+    background: rgba(212, 165, 116, 0.08);
+    border-color: var(--admin-accent);
+}
+
+/* --- Dropzone --- */
+.ve-dropzone {
+    border: 2px dashed var(--admin-border-input);
+    border-radius: var(--admin-radius-sm);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ve-dropzone:hover,
+.ve-dropzone.dragover {
+    border-color: var(--admin-accent);
+    background: rgba(212, 165, 116, 0.05);
+}
+
+.ve-dropzone-small {
+    min-height: 100px;
+}
+
+.ve-dropzone-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--admin-text-muted);
+    font-size: 0.85rem;
+}
+
+.ve-dropzone-icon {
+    font-size: 2rem;
+    opacity: 0.5;
+}
+
+.ve-dropzone-preview {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* --- Slider --- */
+.ve-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ve-slider-label {
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+    white-space: nowrap;
+}
+
+.ve-range {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--admin-border-medium);
+    border-radius: 3px;
+    outline: none;
+}
+
+.ve-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--admin-primary);
+    cursor: grab;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.ve-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--admin-primary);
+    cursor: grab;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* --- Preview Panel --- */
+.ve-preview-panel {
+    padding: 24px;
+    background: var(--admin-bg);
+    border-left: 1px solid var(--admin-border-medium);
+    overflow-y: auto;
+    max-height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+}
+
+.ve-preview-block {
+    margin-bottom: 24px;
+}
+
+.ve-preview-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+}
+
+/* --- Card Preview (mimics public .event-card) --- */
+.ve-card-preview-wrap {
+    max-width: 380px;
+}
+
+.ve-event-card {
+    display: block;
+    background: #F5F3EF;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.ve-event-card-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    background: #e8e2d8;
+}
+
+.ve-event-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ve-event-card-content {
+    padding: 20px;
+}
+
+.ve-event-card-date {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.ve-event-card-date .ve-day {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #41312c;
+}
+
+.ve-event-card-date .ve-month {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #1E85BD;
+    font-weight: 600;
+}
+
+.ve-event-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #41312c;
+    margin: 8px 0 6px;
+}
+
+.ve-event-location {
+    font-size: 0.85rem;
+    color: #8A7A6F;
+    margin: 0 0 8px;
+}
+
+.ve-event-description {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+    margin: 0 0 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.ve-event-card-link {
+    font-size: 0.85rem;
+    color: #1E85BD;
+    font-weight: 500;
+}
+
+/* --- Image Drag Area --- */
+.ve-image-drag-area {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.ve-image-drag-area:active {
+    cursor: grabbing;
+}
+
+.ve-drag-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 10px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.ve-image-drag-area:hover .ve-drag-hint,
+.ve-image-drag-area.dragging .ve-drag-hint {
+    opacity: 1;
+}
+
+/* --- Price + currency row --- */
+.ve-price-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.ve-price-row .ve-input { flex: 1; }
+.ve-price-row .ve-currency-select { width: 90px; flex: none; }
+.ve-vat-toggle {
+    flex: none;
+    white-space: nowrap;
+    font-size: 0.82rem;
+}
+
+/* --- Summernote editors: start compact, auto-grow with content;
+       drag handle still available to resize manually --- */
+.ve-form-panel .note-editor .note-editable {
+    resize: vertical;
+    overflow: auto;
+    min-height: 90px;
+    height: auto;
+}
+
+/* Plain textareas: compact default, JS auto-grows them on input */
+.ve-form-panel .ve-textarea {
+    min-height: 60px;
+    overflow: hidden;
+}
+
+/* --- Inline info note (e.g. "payment details live in the Manage panel") --- */
+.ve-note {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 14px 0 4px;
+    padding: 10px 14px;
+    border: 1px solid var(--accent-blue-bg, #DBEAFE);
+    background: var(--accent-blue-bg, #EFF6FF);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--admin-text-secondary, #444);
+}
+.ve-note-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-blue, #1D4ED8);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+}
+.ve-note a { font-weight: 600; }
+
+/* --- Writing Guide (collapsible tips + AI prompt) --- */
+.ve-guide {
+    margin-bottom: 20px;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: 8px;
+    background: var(--admin-bg);
+}
+
+.ve-guide-summary {
+    cursor: pointer;
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    user-select: none;
+    list-style: none;
+}
+
+.ve-guide-summary::-webkit-details-marker { display: none; }
+
+.ve-guide-summary::before {
+    content: '\25B8';
+    display: inline-block;
+    margin-right: 8px;
+    transition: transform 0.15s ease;
+}
+
+.ve-guide[open] .ve-guide-summary::before {
+    transform: rotate(90deg);
+}
+
+.ve-guide-hint {
+    font-weight: 400;
+    color: var(--admin-text-muted);
+    font-size: 0.8rem;
+}
+
+.ve-guide-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--admin-border-medium);
+    padding-top: 12px;
+}
+
+.ve-guide-tips {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--admin-text-secondary, #444);
+}
+
+.ve-guide-copy-label {
+    font-size: 0.82rem;
+    color: var(--admin-text-muted);
+    margin: 0 0 8px;
+}
+
+.ve-guide-prompt {
+    width: 100%;
+    font-family: monospace;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    padding: 10px;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--admin-text-secondary, #333);
+    resize: vertical;
+    margin-bottom: 8px;
+}
+
+.ve-guide-copy-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.ve-guide-copy-btn:hover { background: rgba(0,0,0,0.05); }
+
+.ve-guide-copy-btn.copied {
+    background: var(--accent-green, #2e7d32);
+    color: #fff;
+    border-color: transparent;
+}
+
+/* --- Full Page Preview (iframe of the real course page) --- */
+.ve-preview-label-note {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--admin-text-muted);
+}
+
+.ve-full-preview-wrap {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--admin-border-medium);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+.ve-full-preview-frame {
+    display: block;
+    width: 100%;
+    height: 70vh;
+    min-height: 480px;
+    border: 0;
+}
+
+.ve-full-preview-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--admin-text-muted);
+    background: var(--admin-bg);
+}
+
+/* --- Hero Preview (mimics public .event-hero) --- */
+.ve-hero-preview-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.ve-event-hero {
+    position: relative;
+    min-height: 260px;
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+    background: #2a2220;
+    overflow: hidden;
+}
+
+.ve-event-hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+}
+
+.ve-event-hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ve-event-hero-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.8) 100%);
+}
+
+.ve-event-hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.ve-event-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ve-event-type {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #fff;
+    color: #41312c;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ve-event-date-full {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.9);
+}
+
+.ve-event-hero h1 {
+    font-size: 1.6rem;
+    color: #E8C9A0;
+    margin: 0 0 6px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    line-height: 1.2;
+}
+
+.ve-event-location-full {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    margin: 0;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+    .ve-container {
+        grid-template-columns: 1fr;
+    }
+
+    .ve-preview-panel {
+        position: static;
+        max-height: none;
+        border-left: none;
+        border-top: 1px solid var(--admin-border-medium);
+    }
+
+    .ve-form-panel {
+        max-height: none;
+    }
+
+    .ve-tab-switcher {
+        display: flex;
+    }
+
+    /* When tab switcher is visible, panels toggle */
+    .ve-form-panel.hidden,
+    .ve-preview-panel.hidden {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .ve-header {
+        padding: 10px 16px;
+    }
+
+    .ve-header-title {
+        font-size: 0.95rem;
+    }
+
+    .ve-form-panel {
+        padding: 16px;
+    }
+
+    .ve-preview-panel {
+        padding: 16px;
+    }
+
+    .ve-section {
+        padding: 16px;
+    }
+
+    .ve-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ve-save-btn {
+        padding: 7px 14px;
+        font-size: 0.82rem;
+    }
+
+    .ve-view-btn {
+        display: none;
+    }
+
+    .ve-card-preview-wrap {
+        max-width: 100%;
+    }
+
+    .ve-event-hero {
+        min-height: 200px;
+    }
+
+    .ve-event-hero h1 {
+        font-size: 1.3rem;
+    }
+}

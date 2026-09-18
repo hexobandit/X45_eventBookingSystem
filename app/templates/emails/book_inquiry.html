@@ -1,0 +1,40 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}{{ label }}{% endblock %}
+
+{% block content %}
+<h2>{{ label }}</h2>
+
+<div class="event-details">
+    <h3>Details</h3>
+    {% if inquiry.name %}
+    <div class="detail-row">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value">{{ inquiry.name }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Email:</span>
+        <span class="detail-value"><a href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Type:</span>
+        <span class="detail-value">{{ inquiry.type.value }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Received:</span>
+        <span class="detail-value">{{ inquiry.created_at.strftime('%-d %B %Y %H:%M') }}</span>
+    </div>
+</div>
+
+{% if inquiry.message %}
+<div class="event-details">
+    <h3>Message</h3>
+    <p style="white-space: pre-wrap;">{{ inquiry.message }}</p>
+</div>
+{% endif %}
+
+<p style="text-align: center;">
+    <a href="{{ config.CANONICAL_DOMAIN }}/admin/" class="btn">Open admin</a>
+</p>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}{{ site_name }}{% endblock %}
+
+{% block content %}
+{{ message_html|safe }}
+
+<p>
+    Kind regards,<br>
+    <strong>{{ site_authors_line }}</strong>
+</p>
+{% endblock %}

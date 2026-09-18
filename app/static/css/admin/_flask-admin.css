@@ -1,0 +1,800 @@
+/* ==========================================================================
+   Flask-Admin Override Styles
+   Customizes Flask-Admin's default elements to match admin theme
+   ========================================================================== */
+
+/* Hide Flask-Admin's default navbar (we use sidebar instead) */
+.admin-main > .navbar,
+.admin-main .navbar-expand-lg {
+    display: none !important;
+}
+
+/* ==========================================================================
+   LIST VIEW — Card-wrapped layout
+   ========================================================================== */
+
+/* ---- Tab Navigation (List / Create / etc.) ---- */
+.admin-main .nav-tabs {
+    border-bottom: none;
+    margin-bottom: 0;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+.admin-main .nav-tabs .nav-item {
+    margin-bottom: 0;
+}
+.admin-main .nav-tabs .nav-link {
+    color: var(--admin-text-muted);
+    font-weight: 600;
+    font-size: 0.82rem;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-sm);
+    padding: 8px 18px;
+    transition: all 0.15s;
+    background: var(--admin-bg-card);
+}
+.admin-main .nav-tabs .nav-link:hover {
+    color: var(--admin-primary);
+    border-color: var(--admin-accent);
+    background: var(--admin-bg-subtle);
+}
+.admin-main .nav-tabs .nav-link.active {
+    color: white;
+    background: var(--admin-primary);
+    border-color: var(--admin-primary);
+}
+
+/* ---- Toolbar: Search + Actions — card row ---- */
+.admin-main .btn-toolbar {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+/* Search box */
+.admin-main .btn-toolbar .input-group {
+    max-width: 340px;
+}
+.admin-main .btn-toolbar .input-group .form-control {
+    border-radius: var(--admin-radius-sm) 0 0 var(--admin-radius-sm);
+    border: 1px solid var(--admin-border-input);
+    padding: 8px 14px;
+    font-size: 0.84rem;
+    background: var(--admin-bg-card);
+    box-shadow: var(--admin-shadow-sm);
+}
+.admin-main .btn-toolbar .input-group .form-control:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.15);
+}
+.admin-main .btn-toolbar .input-group .input-group-append .btn,
+.admin-main .btn-toolbar .input-group .input-group-btn .btn {
+    border-radius: 0 var(--admin-radius-sm) var(--admin-radius-sm) 0;
+    border: 1px solid var(--admin-border-input);
+    border-left: 0;
+    background: var(--admin-bg-card);
+    color: var(--admin-text-muted);
+    padding: 8px 12px;
+    box-shadow: var(--admin-shadow-sm);
+}
+.admin-main .btn-toolbar .input-group .input-group-append .btn:hover,
+.admin-main .btn-toolbar .input-group .input-group-btn .btn:hover {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-primary);
+}
+
+/* ---- "With selected" action dropdown ---- */
+.admin-main .btn-toolbar .dropdown .btn {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-input);
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: var(--admin-radius-sm);
+    padding: 8px 16px;
+    box-shadow: var(--admin-shadow-sm);
+}
+.admin-main .btn-toolbar .dropdown .btn:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+}
+.admin-main .btn-toolbar .dropdown .dropdown-menu {
+    border-radius: var(--admin-radius-sm);
+    border: 1px solid var(--admin-border-medium);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    padding: 6px;
+    margin-top: 4px;
+}
+.admin-main .btn-toolbar .dropdown .dropdown-menu a {
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.84rem;
+    padding: 8px 14px;
+    color: var(--admin-text-secondary);
+}
+.admin-main .btn-toolbar .dropdown .dropdown-menu a:hover {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-primary);
+}
+
+/* Other toolbar buttons (export, etc.) */
+.admin-main .btn-toolbar > .btn,
+.admin-main .btn-toolbar > .btn-group > .btn {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-input);
+    color: var(--admin-text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: var(--admin-radius-sm);
+    padding: 8px 16px;
+    box-shadow: var(--admin-shadow-sm);
+}
+.admin-main .btn-toolbar > .btn:hover,
+.admin-main .btn-toolbar > .btn-group > .btn:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+    background: var(--admin-bg-subtle);
+}
+
+/* ---- Filters ---- */
+.admin-main .filters {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--admin-shadow-sm);
+    border: 1px solid var(--admin-border);
+}
+.admin-main .filter-row {
+    margin-bottom: 8px;
+}
+.admin-main .filters .btn {
+    font-size: 0.82rem;
+}
+
+/* ==========================================================================
+   TABLE — Premium card-wrapped table
+   ========================================================================== */
+
+/* Wrap the model-list table form in a card */
+.admin-main form[method="POST"]:has(.model-list),
+.admin-main form[action]:has(.model-list) {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow-sm);
+    border: 1px solid var(--admin-border);
+    overflow: hidden;
+}
+
+/* Fallback: target the table directly */
+.admin-main .table {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    overflow: hidden;
+    box-shadow: var(--admin-shadow-sm);
+    border: none;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* When table is inside card form, remove its own shadow */
+.admin-main form:has(.model-list) .table {
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.admin-main .table thead th {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--admin-border-medium);
+    border-top: none;
+    padding: 12px 16px;
+    white-space: nowrap;
+}
+.admin-main .table thead th a {
+    color: var(--admin-text-muted);
+    text-decoration: none;
+}
+.admin-main .table thead th a:hover {
+    color: var(--admin-primary);
+}
+
+.admin-main .table tbody td {
+    padding: 14px 16px;
+    font-size: 0.84rem;
+    color: var(--admin-text-secondary);
+    border-bottom: 1px solid var(--admin-border-light);
+    border-top: none;
+    vertical-align: middle;
+}
+.admin-main .table tbody tr:last-child td {
+    border-bottom: none;
+}
+.admin-main .table tbody tr:hover td {
+    background: var(--admin-bg-subtle);
+}
+
+/* Table links */
+.admin-main .table tbody td a {
+    color: var(--admin-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+.admin-main .table tbody td a:hover {
+    color: var(--admin-accent);
+}
+
+/* ---- Checkbox column ---- */
+.admin-main .table thead th.list-checkbox,
+.admin-main .table tbody td.list-checkbox {
+    width: 44px;
+    text-align: center;
+    padding-left: 16px;
+    padding-right: 8px;
+}
+.admin-main .table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--admin-primary);
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+/* ---- Row Action Links ---- */
+.admin-main .list-buttons-column {
+    white-space: nowrap;
+}
+.admin-main .list-buttons-column a {
+    color: var(--admin-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-right: 14px;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+.admin-main .list-buttons-column a:hover {
+    color: var(--admin-accent);
+}
+
+/* ---- Pagination ---- */
+.admin-main .pagination {
+    margin-top: 20px;
+    gap: 2px;
+}
+.admin-main .pagination .page-link {
+    color: var(--admin-primary);
+    border-radius: var(--admin-radius-sm);
+    margin: 0 2px;
+    border: 1px solid var(--admin-border-input);
+    transition: all 0.15s;
+    font-size: 0.84rem;
+    padding: 6px 12px;
+}
+.admin-main .pagination .page-link:hover {
+    background: var(--admin-bg-subtle);
+    border-color: var(--admin-accent);
+}
+.admin-main .pagination .page-item.active .page-link {
+    background: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: white;
+}
+.admin-main .pagination .page-item.disabled .page-link {
+    color: var(--admin-text-muted);
+    background: transparent;
+    border-color: var(--admin-border-light);
+}
+
+/* Row count text */
+.admin-main .model-list + .row .text-muted,
+.admin-main .model-list ~ p,
+.admin-main .list-row-count {
+    font-size: 0.78rem;
+    color: var(--admin-text-muted);
+    margin-top: 12px;
+}
+
+/* ==========================================================================
+   DETAIL VIEW
+   ========================================================================== */
+.admin-main .table.model-detail {
+    border-radius: var(--admin-radius);
+}
+.admin-main .table.model-detail th {
+    font-weight: 600;
+    color: var(--admin-primary);
+    font-size: 0.82rem;
+    width: 200px;
+    background: var(--admin-bg-subtle);
+}
+.admin-main .table.model-detail td {
+    font-size: 0.84rem;
+}
+
+/* ==========================================================================
+   FORMS — Edit/Create views
+   ========================================================================== */
+
+.admin-main .admin-form {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    padding: 24px 28px;
+    box-shadow: var(--admin-shadow-sm);
+    border: 1px solid var(--admin-border);
+}
+
+/* Two-column grid layout for form fields */
+.admin-main .admin-form fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+}
+
+/* Form groups - compact spacing, stacked label + input */
+.admin-main .admin-form .form-group {
+    margin-bottom: 14px;
+    padding: 0;
+    background: transparent;
+}
+.admin-main .admin-form .form-group > .row {
+    display: block;
+}
+.admin-main .admin-form .form-group .col-md-2,
+.admin-main .admin-form .form-group .col-md-10 {
+    max-width: 100%;
+    flex: none;
+    padding-left: 0;
+}
+
+/* Textarea and rich-text fields span full width */
+.admin-main .admin-form .form-group:has(textarea) {
+    grid-column: 1 / -1;
+}
+
+/* Text inputs, selects, textareas */
+.admin-main .form-control {
+    border-radius: var(--admin-radius-sm);
+    border: 1px solid var(--admin-border-input);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.admin-main .form-control:focus {
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.12);
+}
+.admin-main textarea.form-control {
+    min-height: 80px;
+}
+.admin-main select.form-control {
+    padding: 8px 14px;
+}
+
+/* Labels */
+.admin-main .col-form-label,
+.admin-main label.control-label {
+    color: var(--admin-primary);
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Help text */
+.admin-main .help-block,
+.admin-main .form-text {
+    color: var(--admin-text-muted);
+    font-size: 0.75rem;
+    margin-top: 3px;
+}
+
+/* Required asterisk */
+.admin-main .text-danger {
+    color: var(--accent-red) !important;
+}
+
+/* Checkboxes - compact inline layout */
+.admin-main .admin-form .form-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+    accent-color: var(--admin-primary);
+    cursor: pointer;
+}
+.admin-main .admin-form .form-group .col-form-label.d-block {
+    display: inline !important;
+    margin-bottom: 0;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.admin-main .btn {
+    border-radius: var(--admin-radius-sm);
+    font-weight: 600;
+    font-size: 0.84rem;
+    padding: 8px 20px;
+    transition: all 0.15s;
+    cursor: pointer;
+}
+.admin-main .btn-primary {
+    background: var(--admin-accent);
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+    font-weight: 600;
+}
+.admin-main .btn-primary:hover,
+.admin-main .btn-primary:focus {
+    background: var(--admin-accent-bright);
+    border-color: var(--admin-accent-bright);
+    color: var(--admin-primary);
+}
+.admin-main .btn-secondary {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-input);
+    color: var(--admin-primary);
+}
+.admin-main .btn-secondary:hover,
+.admin-main .btn-secondary:focus {
+    background: var(--admin-bg-subtle);
+    border-color: var(--admin-primary);
+    color: var(--admin-primary);
+}
+.admin-main .btn-danger {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-input);
+    color: var(--status-cancelled-text);
+}
+.admin-main .btn-danger:hover,
+.admin-main .btn-danger:focus {
+    background: var(--status-cancelled-bg);
+    border-color: var(--status-cancelled-text);
+    color: var(--status-cancelled-text);
+}
+.admin-main .btn-default,
+.admin-main .btn-light {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-input);
+    color: var(--admin-text-secondary);
+}
+.admin-main .btn-default:hover,
+.admin-main .btn-light:hover {
+    background: var(--admin-bg-subtle);
+    border-color: var(--admin-primary);
+}
+
+/* Submit row - button group at bottom of forms, spans full width in grid */
+.admin-main .submit-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid var(--admin-border-medium);
+    grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   ALERTS
+   ========================================================================== */
+
+.admin-main .alert {
+    border-radius: var(--admin-radius-sm);
+    margin-bottom: 20px;
+    border: none;
+    font-size: 0.85rem;
+    padding: 12px 20px;
+}
+.admin-main .alert-success {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+}
+.admin-main .alert-danger,
+.admin-main .alert-error {
+    background: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+}
+.admin-main .alert-warning {
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
+}
+.admin-main .alert-info {
+    background: var(--status-waitlist-bg);
+    color: var(--status-waitlist-text);
+}
+
+/* ==========================================================================
+   BADGES — Registration & Payment Status
+   ========================================================================== */
+
+.badge-reg {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.badge-pending {
+    background: var(--status-pending-bg);
+    color: var(--status-pending-text);
+}
+.badge-confirmed {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+}
+.badge-cancelled {
+    background: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+}
+.badge-waitlist {
+    background: var(--status-waitlist-bg);
+    color: var(--status-waitlist-text);
+}
+.badge-paid {
+    background: #d4edda;
+    color: #155724;
+}
+.badge-ext {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    background: #dbeafe;
+    color: #1e40af;
+}
+.badge-unpaid {
+    background: #fff3cd;
+    color: #856404;
+}
+.badge-refunded {
+    background: #e2e3e5;
+    color: #383d41;
+}
+/* ---- Stacked list cells (name + email, date + relative) ---- */
+.cell-main {
+    font-weight: 600;
+    color: var(--admin-text);
+}
+.cell-sub {
+    font-size: 0.75rem;
+    color: var(--admin-text-muted);
+    margin-top: 2px;
+}
+.cell-sub a { color: inherit; }
+.nowrap { white-space: nowrap; }
+
+/* Inline capacity bar in the course list */
+.capacity-bar-list {
+    display: block;
+    margin-top: 4px;
+    width: 72px;
+}
+.capacity-bar-list .capacity-bar-fill { display: block; }
+.reg-link { text-decoration: none; }
+
+.btn-list-manage {
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.badge-method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.badge-method-stripe {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.badge-method-bank {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* ---- List page heading (matches custom dashboard/manage pages) ---- */
+.list-page-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.list-page-head h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--admin-text);
+    margin: 0;
+}
+.list-page-count {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--admin-text-muted);
+}
+
+/* Status icon badges (checkmark / X / dash) */
+.badge-icon {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.badge-icon.badge-yes {
+    color: var(--accent-green);
+}
+.badge-icon.badge-no {
+    color: var(--admin-text-muted);
+}
+
+/* Labeled status pills — self-explanatory without reading the column header */
+.badge-status {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+.badge-status-yes {
+    background: var(--accent-green-bg);
+    color: var(--accent-green);
+}
+.badge-status-no {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text-muted);
+}
+.badge-status-pending {
+    background: var(--accent-amber-bg);
+    color: var(--accent-amber);
+}
+
+/* ---- Event → Registration Link ---- */
+a.reg-link {
+    font-weight: 600;
+    color: var(--admin-primary);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: var(--admin-radius-sm);
+    transition: all 0.15s;
+}
+a.reg-link:hover {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-accent);
+}
+
+/* ==========================================================================
+   BOOLEAN ICONS
+   ========================================================================== */
+
+.admin-main .fa-check,
+.admin-main .icon-ok-sign,
+.admin-main .glyphicon-ok {
+    color: var(--accent-green);
+}
+.admin-main .fa-times,
+.admin-main .icon-minus-sign,
+.admin-main .glyphicon-minus {
+    color: var(--accent-red);
+}
+
+/* ==========================================================================
+   SELECT2
+   ========================================================================== */
+
+.admin-main .select2-container--default .select2-selection--single {
+    border-radius: var(--admin-radius-sm);
+    border-color: var(--admin-border-input);
+    height: 42px;
+    padding: 6px 4px;
+}
+.admin-main .select2-container--default .select2-selection--single:focus,
+.admin-main .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: var(--admin-accent);
+}
+
+/* ==========================================================================
+   DISABLED / READ-ONLY FORM INPUTS
+   ========================================================================== */
+
+.admin-main .form-control:disabled,
+.admin-main .form-control[disabled],
+.admin-main select.form-control:disabled,
+.admin-main textarea.form-control:disabled {
+    background: var(--admin-bg-subtle);
+    border-color: var(--admin-border-light);
+    color: var(--admin-text-muted);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+.admin-main input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.admin-main .select2-container--disabled .select2-selection--single {
+    background: var(--admin-bg-subtle) !important;
+    border-color: var(--admin-border-light) !important;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   FORM SECTION HEADERS (form_edit_rules)
+   ========================================================================== */
+
+.admin-main .admin-form h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--admin-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 20px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--admin-border-medium);
+    grid-column: 1 / -1;
+}
+.admin-main .admin-form h3:first-child {
+    margin-top: 0;
+}
+
+/* ==========================================================================
+   DELETE DANGER ZONE
+   ========================================================================== */
+
+.admin-main .delete-zone {
+    margin-top: 40px;
+    padding: 20px 24px;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--status-cancelled-bg);
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow-sm);
+}
+.admin-main .delete-zone h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--status-cancelled-text);
+    margin: 0 0 6px;
+}
+.admin-main .delete-zone p {
+    font-size: 0.82rem;
+    color: var(--admin-text-muted);
+    margin: 0 0 14px;
+}
+
+/* ==========================================================================
+   BOOTSTRAP TABLE OVERRIDES — kill default Bootstrap stripes/borders
+   ========================================================================== */
+
+.admin-main .table-striped tbody tr:nth-of-type(odd) {
+    background-color: transparent;
+}
+.admin-main .table-bordered {
+    border: none;
+}
+.admin-main .table-bordered td,
+.admin-main .table-bordered th {
+    border: none;
+    border-bottom: 1px solid var(--admin-border-light);
+}
+.admin-main .table-bordered thead th {
+    border-bottom: 1px solid var(--admin-border-medium);
+}

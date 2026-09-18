@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Admin Variables - Design Tokens
+   Light admin, aligned to the site's black-and-white + rubber-dam-blue
+   identity: cool near-black surfaces (sidebar) + blue accents on a cool
+   off-white. Accent darkened vs the site's #29ABE2 for contrast on light.
+   ========================================================================== */
+
+:root {
+    /* Admin Brand — cool near-black (drives sidebar + dark UI), matches site */
+    --admin-primary: #14181C;
+    --admin-primary-light: #232A31;
+
+    /* Rubber-dam blue — the site accent (#29ABE2 family) */
+    --admin-accent: #1E85BD;
+    --admin-accent-bright: #29ABE2;
+    --admin-accent-deep: #16628A;
+
+    /* Admin Backgrounds — cool off-white to echo the site */
+    --admin-bg: #F2F4F6;
+    --admin-bg-card: #ffffff;
+    --admin-bg-subtle: #F8FAFB;
+
+    /* Admin Text */
+    --admin-text: #16191C;
+    --admin-text-secondary: #313840;
+    --admin-text-muted: #79838C;
+
+    /* Admin Borders */
+    --admin-border: rgba(0,0,0,0.05);
+    --admin-border-light: #eef1f4;
+    --admin-border-medium: #e5eaee;
+    --admin-border-input: #d3dce2;
+
+    /* Admin Shadows */
+    --admin-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --admin-shadow-hover: 0 8px 24px rgba(0,0,0,0.08);
+
+    /* Admin Radius */
+    --admin-radius: 14px;
+    --admin-radius-sm: 8px;
+    --admin-radius-xs: 6px;
+    --admin-radius-pill: 20px;
+
+    /* Status Colors */
+    --status-pending-bg: #FEF3C7;
+    --status-pending-text: #92400E;
+    --status-confirmed-bg: #D1FAE5;
+    --status-confirmed-text: #065F46;
+    --status-cancelled-bg: #FEE2E2;
+    --status-cancelled-text: #991B1B;
+    --status-waitlist-bg: #DBEAFE;
+    --status-waitlist-text: #1E40AF;
+
+    /* Accent Colors — dashboard stat icons.
+       'purple' remapped to the brand blue so the palette stays cohesive. */
+    --accent-blue-bg: #E3F2FB;
+    --accent-blue: #1E85BD;
+    --accent-green-bg: #ECFDF5;
+    --accent-green: #059669;
+    --accent-purple-bg: #E3F2FB;
+    --accent-purple: #1E85BD;
+    --accent-amber-bg: #FFF7ED;
+    --accent-amber: #D97706;
+    --accent-red: #DC2626;
+}

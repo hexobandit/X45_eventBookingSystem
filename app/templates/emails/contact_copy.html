@@ -1,0 +1,23 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Copy of your message - {{ site_name }}{% endblock %}
+
+{% block content %}
+<h2>Thank you for your message</h2>
+
+<p>Dear {{ name }},</p>
+<p>thank you for contacting us. We have received your message and will get back to you as soon as possible. A copy of your message is below.</p>
+
+<div class="event-details">
+    <h3>Your message</h3>
+    {% if subject %}
+    <div class="detail-row">
+        <span class="detail-label">Subject:</span>
+        <span class="detail-value">{{ subject }}</span>
+    </div>
+    {% endif %}
+    <p style="white-space: pre-wrap;">{{ message }}</p>
+</div>
+
+<p style="color: #7A848D; font-size: 0.85em;">This email is an automatic copy of the message you sent via the contact form on {{ canonical_domain.replace('https://','') }}. Please don't reply to it — we will contact you directly.</p>
+{% endblock %}

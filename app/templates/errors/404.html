@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found | {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">404</span>
+        <h1>Page not found</h1>
+        <p>The page you are looking for doesn't exist or has been moved.</p>
+        <div class="status-actions">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to home</a>
+            <a href="{{ url_for('main.courses') }}" class="btn">View courses</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

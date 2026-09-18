@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ site_name }} — {{ site_title_suffix }}{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-eyebrow" data-stagger="1">{{ site_title_suffix }}</span>
+        <h1 class="hero-title" data-stagger="2">{{ site_name }}</h1>
+        <div class="hero-manifesto" data-stagger="3" aria-label="{{ site_tagline }}">
+            {% set phrases = site_tagline.rstrip('.').split('. ') %}
+            {% for phrase in phrases %}
+            <span>{{ phrase }}</span>
+            {% if not loop.last %}<span class="bar" aria-hidden="true"></span>{% endif %}
+            {% endfor %}
+        </div>
+        <div class="hero-actions" data-stagger="4">
+            <a href="{{ url_for('main.courses') }}" class="btn btn-primary">View courses</a>
+            <a href="{{ url_for('main.about') }}" class="btn">About us</a>
+        </div>
+    </div>
+    <span class="hero-scroll" aria-hidden="true"></span>
+</section>
+
+<!-- Intro -->
+<section class="section philosophy">
+    <div class="container-narrow reveal">
+        <span class="eyebrow">Why we teach</span>
+        <p>Craft is learned by doing, and it is learned faster when someone who has made all the mistakes already stands next to you.</p>
+        <p>At <strong>{{ site_name }}</strong> we keep groups small, put the equipment in your hands from the first hour, and build every session around the situations you actually meet on a job.</p>
+        <p>Theory in the morning, practice for the rest of the day, and honest feedback throughout.</p>
+        <hr class="rule rule--center">
+    </div>
+</section>
+
+<!-- Upcoming courses -->
+<section class="section">
+    <div class="container">
+        <div class="section-head reveal">
+            <h2>Upcoming courses</h2>
+            <a href="{{ url_for('main.courses') }}" class="view-all">All courses &rarr;</a>
+        </div>
+
+        {% if events %}
+        <div class="course-list reveal">
+            {% for event in events %}
+            <a href="{{ url_for('main.course_detail', slug=event.slug) }}" class="course-row">
+                <span class="course-date">
+                    <span class="day">{{ event.event_date.day }}</span>
+                    <span class="month">{{ event.month_display[:3] }}</span>
+                    <span class="year">{{ event.event_date.year }}</span>
+                </span>
+                <span class="course-info">
+                    <h3>{{ event.title }}</h3>
+                    <span class="course-meta">
+                        <span>{{ event.event_type|capitalize }}</span>
+                        <span>{{ event.location }}</span>
+                        <span>{{ event.formatted_price }}</span>
+                    </span>
+                </span>
+                <span class="course-status{% if event.is_full %} is-full{% elif event.spots_left <= 3 %} is-low{% endif %}">
+                    {% if event.is_full %}Fully booked{% elif event.spots_left <= 3 %}{{ event.spots_left }} seat{{ 's' if event.spots_left != 1 }} left{% else %}Open{% endif %}
+                </span>
+                <span class="course-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="courses-empty">New course dates are being prepared. <a href="{{ url_for('main.contact') }}">Get in touch</a> to hear about them first.</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Closing CTA -->
+<section class="section cta-strip">
+    <div class="container reveal">
+        <span class="eyebrow">Questions?</span>
+        <h2 style="margin-bottom: var(--sp-6);">Not sure which course fits?</h2>
+        <p>Tell us what you shoot and where you are stuck. We will point you to the right session, or tell you honestly if none of them is for you yet.</p>
+        <a href="{{ url_for('main.contact') }}" class="btn">Write to us</a>
+    </div>
+</section>
+{% endblock %}

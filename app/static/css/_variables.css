@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Design tokens — black-and-white poster, rubber-dam blue
+   Per the client's course poster: a pure-black field, silver type, and the
+   vivid blue of the rubber dam (#29ABE2, sampled from the E A E wordmark).
+   A second, muted steel blue carries the poster's quiet display lines.
+   The vertical bar of the E|A|E wordmark stays the structural device:
+   thin rules, quiet surfaces, ultra-light letterspaced display type.
+   ========================================================================== */
+
+:root {
+    /* Surfaces — cool near-black, like the poster field */
+    --bg-body: #070809;
+    --bg-card: #0E1114;
+    --bg-elevated: #151A1F;
+
+    /* Lines */
+    --border-color: #1F252B;
+    --border-accent: rgba(41, 171, 226, 0.35);
+
+    /* Accent blue */
+    --accent: #29ABE2;
+    --accent-bright: #5CC1EE;
+    --accent-deep: #1B7DA8;
+    --accent-dim: rgba(41, 171, 226, 0.12);
+    --accent-metal: linear-gradient(135deg, #A8DCF5 0%, #29ABE2 45%, #16628A 100%);
+
+    /* Steel — the poster's muted text blue ("OBSERVE.", "DISAPPEAR.") */
+    --accent-steel: #8FA9C6;
+
+    /* Text — cool silver */
+    --text-primary: #EBEEF1;
+    --text-secondary: #A7B0B8;
+    --text-muted: #6C767F;
+
+    /* Feedback (desaturated, cool) */
+    --success: #85C4A3;
+    --error: #D98E8E;
+    --warning: #D4BC82;
+    --info: #8FB8D9;
+
+    /* Type */
+    --font-display: 'Nunito Sans', sans-serif;   /* weight 200 only */
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --tracking-display: 0.12em;
+    --tracking-wordmark: 0.42em;
+    --tracking-eyebrow: 0.28em;
+
+    /* Fluid type scale (mobile-first) */
+    --fs-wordmark: clamp(2.1rem, 9vw, 5.5rem);
+    --fs-display: clamp(1.9rem, 6vw, 3.5rem);
+    --fs-h1: clamp(1.65rem, 4.5vw, 2.5rem);
+    --fs-h2: clamp(1.3rem, 3.2vw, 1.85rem);
+    --fs-h3: 1.1rem;
+    --fs-body: 1rem;
+    --lh-body: 1.75;
+    --fs-small: 0.875rem;
+    --fs-micro: 0.72rem;
+
+    /* Spacing — 4px base */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-6: 1.5rem;
+    --sp-8: 2rem;
+    --sp-12: 3rem;
+    --sp-16: 4rem;
+    --sp-24: 6rem;
+    --section-pad: clamp(4rem, 12vw, 8rem);
+
+    /* Containers */
+    --container: 72rem;
+    --container-narrow: 42rem;
+
+    /* Radii — restrained */
+    --radius-sm: 2px;
+    --radius-md: 4px;
+
+    /* Shadows — barely there; dark UI works with light, not shadow */
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+    /* Motion */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.35s ease;
+    --transition-slow: 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+}

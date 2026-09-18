@@ -1,0 +1,269 @@
+{% extends 'admin/panel_base.html' if request.args.get('panel') else 'admin/master.html' %}
+{% import 'admin/lib.html' as lib with context %}
+{% from 'admin/lib.html' import extra with context %}
+{% set panel_mode = request.args.get('panel') %}
+
+{% block head %}
+  {{ super() }}
+  {{ lib.form_css() }}
+{% endblock %}
+
+{% block body %}
+  {% block navlinks %}
+  {% if panel_mode %}
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+    <a href="{{ url_for('.edit_view', id=request.args.get('id')) }}" target="_top"
+       style="font-size:0.78rem;">Open full edit page &#8599;</a>
+  </div>
+  {% else %}
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a href="{{ return_url }}" class="nav-link">List</a>
+    </li>
+    <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link active">Edit</a>
+    </li>
+  </ul>
+  {% endif %}
+  {% endblock %}
+
+  {% if model %}
+  <div class="dash-card" style="margin-bottom: 24px;">
+    <div class="dash-card-header">
+      <h5>{{ model.full_name }} — {{ model.event.title }}</h5>
+    </div>
+    <div style="padding: 16px 24px;">
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
+        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-right: 4px;">STATUS:</span>
+        {% if model.status.name == 'PENDING' %}
+          <span class="badge-reg badge-pending">Pending</span>
+        {% elif model.status.name == 'CONFIRMED' %}
+          <span class="badge-reg badge-confirmed">Confirmed</span>
+        {% elif model.status.name == 'CANCELLED' %}
+          <span class="badge-reg badge-cancelled">Cancelled</span>
+        {% elif model.status.name == 'WAITLIST' %}
+          <span class="badge-reg badge-waitlist">Waiting list</span>
+        {% endif %}
+        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-left: 12px; margin-right: 4px;">PAYMENT:</span>
+        {% if model.payment_status.name == 'PAID' %}
+          <span class="badge-reg badge-paid">Paid</span>
+        {% elif model.payment_status.name == 'REFUNDED' %}
+          <span class="badge-reg badge-refunded">Refunded</span>
+        {% else %}
+          <span class="badge-reg badge-unpaid">Unpaid</span>
+        {% endif %}
+        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-left: 12px; margin-right: 4px;">EMAILS:</span>
+        <div class="email-indicators">
+          <span class="email-indicator {{ 'sent' if model.payment_email_sent else '' }}" title="Payment">
+            {% if model.payment_email_sent %}&#10003;{% else %}&#10005;{% endif %} P
+          </span>
+          <span class="email-indicator {{ 'sent' if model.reminder_email_sent else '' }}" title="Day-before reminder">
+            {% if model.reminder_email_sent %}&#10003;{% else %}&#10005;{% endif %} R
+          </span>
+          <span class="email-indicator {{ 'sent' if model.custom_email_sent else '' }}" title="Custom message">
+            {% if model.custom_email_sent %}&#10003;{% else %}&#10005;{% endif %} C
+          </span>
+        </div>
+      </div>
+      {# Email actions POST to manage_view — in panel mode that would render
+         the whole manage page inside the iframe, so hide them there. #}
+      {% if model.status.name != 'CANCELLED' and not panel_mode %}
+      <div class="actions-cell">
+        <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="send_confirmation_email">
+          <input type="hidden" name="reg_id" value="{{ model.id }}">
+          <button type="submit" class="btn-action" data-confirm-msg="Send confirmation for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
+            Confirmation
+          </button>
+        </form>
+        {% if model.payment_email_sent %}
+          <span class="btn-action btn-action-done">&#10003; Payment</span>
+        {% else %}
+          <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="send_payment_email">
+            <input type="hidden" name="reg_id" value="{{ model.id }}">
+            <button type="submit" class="btn-action" data-confirm-msg="Send payment details for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
+              Payment
+            </button>
+          </form>
+        {% endif %}
+        {% if model.reminder_email_sent %}
+          <span class="btn-action btn-action-done">&#10003; Day-before reminder</span>
+        {% else %}
+          <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="send_reminder_email">
+            <input type="hidden" name="reg_id" value="{{ model.id }}">
+            <button type="submit" class="btn-action" data-confirm-msg="Send the day-before reminder for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
+              Day-before reminder
+            </button>
+          </form>
+        {% endif %}
+      </div>
+      {% elif model.status.name == 'CANCELLED' %}
+      <span style="font-size: 0.82rem; color: var(--admin-text-muted);">Registration is cancelled — emails cannot be sent.</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% block edit_form %}
+    <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
+      <fieldset>
+        {{ lib.render_form_fields(form, form_opts=form_opts) }}
+        <hr>
+        <div class="form-group">
+          <div class="col-md-offset-2 col-md-10 submit-row">
+            <input type="submit" class="btn btn-primary" value="Save" />
+            {% if not panel_mode %}
+            <a href="{{ return_url }}" class="btn btn-secondary" role="button">Back to list</a>
+            {% endif %}
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  {% endblock %}
+
+  {% if admin_view.can_delete and not panel_mode %}
+  {% block delete_section %}
+    <div class="delete-zone">
+      <h4>Delete registration</h4>
+      <p>The registration is removed from the course and archived under <strong>Deleted registrations</strong>
+         (with your reason). You can choose to notify the participant by email.</p>
+      <form method="POST" action="{{ get_url('.delete_view') }}" id="deleteRegForm">
+        <input type="hidden" name="id" value="{{ request.args.get('id') }}" />
+        <input type="hidden" name="url" value="{{ return_url }}" />
+        {% if csrf_token is defined and csrf_token %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {% endif %}
+        <button type="submit" class="btn btn-danger"
+                data-reg-name="{{ model.full_name if model else '' }}"
+                onclick="window.openDeleteRegModal(this.form, {name: this.dataset.regName}); return false;">
+          Delete registration
+        </button>
+      </form>
+    </div>
+    {% include 'admin/_delete_registration_modal.html' %}
+  {% endblock %}
+  {% endif %}
+{% endblock %}
+
+{% block tail %}
+  {{ super() }}
+  {{ lib.form_js() }}
+  <style>
+    .field-unlock-btn {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--admin-text-muted);
+      background: transparent;
+      border: 1px solid var(--admin-border-medium);
+      border-radius: 4px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .field-unlock-btn:hover {
+      color: var(--brand-primary);
+      border-color: var(--brand-primary);
+    }
+    .field-unlock-confirm {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #FFF7ED;
+      border: 1px solid #FDBA74;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #9A3412;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .field-unlock-confirm span {
+      flex: 1;
+      min-width: 180px;
+    }
+    .field-unlock-confirm .btn-unlock-yes {
+      padding: 3px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #EA580C;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .field-unlock-confirm .btn-unlock-yes:hover {
+      background: #C2410C;
+    }
+    .field-unlock-confirm .btn-unlock-no {
+      padding: 3px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: transparent;
+      color: #9A3412;
+      border: 1px solid #FDBA74;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .field-unlock-confirm .btn-unlock-no:hover {
+      background: #FED7AA;
+    }
+  </style>
+  <script>
+  (function() {
+    var fields = [
+      { name: 'email', label: 'email address', warning: 'Changing the email will affect all future communication with the participant.' },
+      { name: 'phone', label: 'phone number', warning: 'Changing the phone number will be reflected in the registration details.' }
+    ];
+    fields.forEach(function(f) {
+      var input = document.getElementById(f.name);
+      if (!input) return;
+
+      var wrapper = input.closest('.col-md-10') || input.parentNode;
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'field-unlock-btn';
+      btn.textContent = 'Edit';
+      btn.title = 'Unlock field for editing';
+
+      var confirmBox = null;
+
+      btn.addEventListener('click', function() {
+        if (confirmBox) return;
+
+        confirmBox = document.createElement('div');
+        confirmBox.className = 'field-unlock-confirm';
+        confirmBox.innerHTML =
+          '<span>' + f.warning + ' Do you really want to change the ' + f.label + '?</span>' +
+          '<button type="button" class="btn-unlock-yes">Yes, edit</button>' +
+          '<button type="button" class="btn-unlock-no">Cancel</button>';
+
+        wrapper.appendChild(confirmBox);
+
+        confirmBox.querySelector('.btn-unlock-yes').addEventListener('click', function() {
+          input.removeAttribute('readonly');
+          input.style.background = '#fff';
+          input.style.pointerEvents = 'auto';
+          input.focus();
+          confirmBox.remove();
+          btn.remove();
+        });
+
+        confirmBox.querySelector('.btn-unlock-no').addEventListener('click', function() {
+          confirmBox.remove();
+          confirmBox = null;
+        });
+      });
+
+      wrapper.appendChild(btn);
+    });
+  })();
+  </script>
+{% endblock %}

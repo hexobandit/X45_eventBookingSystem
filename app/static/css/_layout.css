@@ -1,0 +1,262 @@
+/* ==========================================================================
+   Layout — header, footer, containers, sections
+   ========================================================================== */
+
+.container {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--sp-6);
+}
+
+.container-narrow {
+    max-width: var(--container-narrow);
+    margin: 0 auto;
+    padding: 0 var(--sp-6);
+}
+
+.section {
+    padding: var(--section-pad) 0;
+}
+
+/* Hairline section divider — full-width, barely-there copper */
+.section + .section {
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- Header ------------------------------------------------------------------ */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    background: rgba(7, 8, 9, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--transition-base);
+}
+
+.header.is-scrolled {
+    border-bottom-color: var(--border-color);
+}
+
+.header-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--sp-6);
+    height: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Wordmark — ultra-light, wide tracking, copper */
+.logo {
+    font-family: var(--font-display);
+    font-weight: 200;
+    font-size: 1.1rem;
+    letter-spacing: var(--tracking-wordmark);
+    text-transform: uppercase;
+    color: var(--accent);
+    /* optical correction for the wide tracking on the last letter */
+    margin-right: calc(-1 * var(--tracking-wordmark));
+}
+
+.logo:hover {
+    color: var(--accent-bright);
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-8);
+}
+
+.nav a {
+    font-size: var(--fs-micro);
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid transparent;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.nav a:hover,
+.nav a.is-active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent);
+}
+
+/* Mobile menu trigger */
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--sp-2);
+    color: var(--text-primary);
+}
+
+.menu-toggle svg {
+    display: block;
+}
+
+/* --- Mobile menu overlay -------------------------------------------------------- */
+
+.overlay-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+    z-index: 950;
+}
+
+.overlay-bg.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(20rem, 85vw);
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    transform: translateX(100%);
+    transition: transform var(--transition-slow);
+    z-index: 960;
+    padding: var(--sp-16) var(--sp-8);
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-overlay.is-open {
+    transform: none;
+}
+
+.menu-overlay nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+}
+
+.menu-overlay nav a {
+    font-family: var(--font-display);
+    font-weight: 200;
+    font-size: 1.3rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--border-accent);
+}
+
+.menu-overlay nav a:hover {
+    color: var(--accent);
+}
+
+.menu-close {
+    position: absolute;
+    top: var(--sp-4);
+    right: var(--sp-4);
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    font-weight: 200;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--sp-2);
+    line-height: 1;
+}
+
+.menu-close:hover {
+    color: var(--accent);
+}
+
+/* --- Footer ------------------------------------------------------------------------ */
+
+.footer {
+    border-top: 1px solid var(--border-color);
+    padding: var(--sp-16) 0 var(--sp-8);
+    margin-top: var(--section-pad);
+}
+
+.footer-grid {
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 var(--sp-6);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--sp-12);
+}
+
+.footer-brand {
+    font-family: var(--font-display);
+    font-weight: 200;
+    font-size: 1rem;
+    letter-spacing: var(--tracking-wordmark);
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--sp-4);
+}
+
+.footer-tagline {
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+    max-width: 22rem;
+}
+
+.footer h4 {
+    font-family: var(--font-body);
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--sp-4);
+}
+
+.footer a {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-2);
+}
+
+.footer a:hover {
+    color: var(--accent);
+}
+
+.footer p {
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-2);
+}
+
+.footer-bottom {
+    max-width: var(--container);
+    margin: var(--sp-12) auto 0;
+    padding: var(--sp-6) var(--sp-6) 0;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.footer-bottom a {
+    display: inline;
+    color: var(--text-muted);
+    font-size: var(--fs-micro);
+}

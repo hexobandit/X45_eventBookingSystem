@@ -1,0 +1,8 @@
+{# Small badge showing how a paid registration was settled. Expects `reg`. #}
+{% if reg.stripe_payment_intent_id %}
+    <span class="badge-method badge-method-stripe" title="Paid by card via Stripe">Stripe</span>
+{% elif reg.payment_method and reg.payment_method.name == 'BANK_TRANSFER' %}
+    <span class="badge-method badge-method-bank" title="Bank transfer">Bank</span>
+{% elif reg.payment_method and reg.payment_method.name == 'CARD' %}
+    <span class="badge-method badge-method-stripe" title="Card payment">Card</span>
+{% endif %}

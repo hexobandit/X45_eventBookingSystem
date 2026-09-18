@@ -1,0 +1,511 @@
+/* ==========================================================================
+   Admin Manage Panel - Per-event management dashboard
+   ========================================================================== */
+
+/* ---- Stats Grid ---- */
+.manage-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.manage-stat-card {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow-sm);
+    border: 1px solid var(--admin-border);
+    padding: 20px;
+    text-align: center;
+}
+.manage-stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--admin-text);
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.manage-stat-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ---- Payment Form Card ---- */
+.payment-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 24px;
+}
+.payment-form-grid .form-group {
+    margin-bottom: 0;
+}
+.payment-form-grid .form-group.full-width {
+    grid-column: 1 / -1;
+}
+.payment-form-grid label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    margin-bottom: 6px;
+}
+.payment-form-grid input,
+.payment-form-grid textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.88rem;
+    color: var(--admin-text);
+    background: var(--admin-bg-card);
+    box-sizing: border-box;
+}
+.payment-form-grid textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+.payment-form-grid input:focus,
+.payment-form-grid textarea:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.15);
+}
+.payment-form-actions {
+    padding: 16px 24px;
+    border-top: 1px solid var(--admin-border-medium);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ---- QR Preview ---- */
+.qr-preview {
+    margin-top: 8px;
+}
+.qr-preview img {
+    max-width: 120px;
+    border-radius: var(--admin-radius-sm);
+    border: 1px solid var(--admin-border-medium);
+}
+
+/* --- Payment methods (domestic CZK / SEPA EUR) --- */
+.pay-intro {
+    margin: 0;
+    padding: 16px 24px 0;
+    font-size: 0.82rem;
+    color: var(--admin-text-muted);
+    line-height: 1.5;
+}
+.payment-form-grid label small {
+    font-weight: 400;
+    color: var(--admin-text-muted);
+}
+.pay-method-status {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.pay-method-chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: var(--admin-radius-pill);
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text-muted);
+    border: 1px solid var(--admin-border-medium);
+}
+.pay-method-chip.on {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+    border-color: transparent;
+}
+.pay-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 0 24px 8px;
+}
+.pay-method {
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+    background: var(--admin-bg-subtle);
+    display: flex;
+    flex-direction: column;
+}
+.pay-method-head {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--admin-border-medium);
+}
+.pay-method-head h6 {
+    margin: 0 0 2px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+.pay-method-sub {
+    font-size: 0.74rem;
+    color: var(--admin-text-muted);
+}
+.pay-method-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 14px 16px;
+}
+.pay-method-fields .form-group { margin-bottom: 0; }
+.pay-method-fields .form-group.full-width { grid-column: 1 / -1; }
+.pay-method-fields label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    margin-bottom: 5px;
+}
+.pay-method-fields label small { font-weight: 400; color: var(--admin-text-muted); }
+.pay-method-fields input[type="text"],
+.pay-method-fields input[type="number"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.88rem;
+    color: var(--admin-text);
+    background: var(--admin-bg-card);
+}
+.pay-method-fields input:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 2px rgba(212, 165, 116, 0.15);
+}
+.pay-method-qr {
+    margin-top: auto;
+    padding: 0 16px 14px;
+}
+.qr-slot {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+.qr-slot img { background: #fff; }
+.qr-download { font-size: 0.78rem; }
+.qr-hint {
+    font-size: 0.74rem;
+    color: var(--admin-text-muted);
+    margin: 8px 0 0;
+    line-height: 1.45;
+}
+.qr-hint-error { color: var(--accent-red); }
+.field-warning {
+    margin: 6px 0 0;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--status-cancelled-text);
+}
+@media (max-width: 900px) {
+    .pay-methods { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+    .pay-method-fields { grid-template-columns: 1fr; }
+}
+
+/* ---- Action Buttons (per-row) ---- */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    background: var(--admin-bg-card);
+    color: var(--admin-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+.btn-action:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+    background: var(--admin-bg-subtle);
+}
+.btn-action-done {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+    border-color: transparent;
+    cursor: default;
+}
+.btn-action-done:hover {
+    background: var(--status-confirmed-bg);
+    color: var(--status-confirmed-text);
+    border-color: transparent;
+}
+
+/* ---- Actions Cell ---- */
+.actions-cell {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* ---- Bulk Actions ---- */
+.bulk-actions {
+    padding: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.btn-bulk {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--admin-border-input);
+    background: var(--admin-bg-card);
+    color: var(--admin-text-secondary);
+    transition: all 0.15s ease;
+}
+.btn-bulk:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+}
+.btn-bulk .bulk-count {
+    font-size: 0.72rem;
+    background: var(--admin-bg-subtle);
+    padding: 2px 6px;
+    border-radius: var(--admin-radius-pill);
+}
+
+/* ---- Email Status Indicators ---- */
+.email-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.72rem;
+    color: var(--admin-text-muted);
+}
+.email-indicator.sent {
+    color: var(--status-confirmed-text);
+}
+.email-indicators {
+    display: flex;
+    gap: 8px;
+}
+
+/* ---- Custom Email Modal ---- */
+.manage-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    display: none;
+}
+.manage-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.manage-modal {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    pointer-events: auto;
+}
+.manage-modal-head {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--admin-border-medium);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.manage-modal-head h5 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+.manage-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--admin-text-muted);
+    padding: 4px;
+}
+.manage-modal-body {
+    padding: 24px;
+}
+.manage-modal-body .form-group {
+    margin-bottom: 16px;
+}
+.manage-modal-body label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    margin-bottom: 6px;
+}
+.manage-modal-body input,
+.manage-modal-body textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.88rem;
+    color: var(--admin-text);
+    box-sizing: border-box;
+}
+.manage-modal-body textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+.manage-modal-foot {
+    padding: 16px 24px;
+    border-top: 1px solid var(--admin-border-medium);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ---- Export Buttons ---- */
+.export-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border: 1px solid var(--admin-border-input);
+    border-radius: var(--admin-radius-xs);
+    background: var(--admin-bg-card);
+    color: var(--admin-text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+.btn-export:hover {
+    border-color: var(--admin-accent);
+    color: var(--admin-primary);
+    background: var(--admin-bg-subtle);
+    text-decoration: none;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1200px) {
+    .manage-stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .manage-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .payment-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .bulk-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .actions-cell {
+        flex-direction: column;
+    }
+}
+
+/* ---- Slide-in registrant edit panel (event_manage.html) ---- */
+.reg-panel-link {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--admin-border-medium);
+    text-underline-offset: 3px;
+}
+.reg-panel-link:hover {
+    color: var(--admin-accent);
+    text-decoration-color: var(--admin-accent);
+}
+
+.reg-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 12, 11, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease;
+    z-index: 1090;
+}
+.reg-panel-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.reg-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(760px, 94vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--admin-bg-content, #fff);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1100;
+}
+.reg-panel.open {
+    transform: translateX(0);
+}
+
+.reg-panel-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--admin-border-medium);
+    flex-shrink: 0;
+}
+.reg-panel-head .btn-action[disabled] {
+    opacity: 0.4;
+    cursor: default;
+}
+.reg-panel-title {
+    flex: 1;
+    font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reg-panel iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+}
+
+/* Chrome-less body used inside the panel iframe (panel_base.html) */
+body.panel-mode {
+    background: var(--admin-bg-content, #fff);
+}
+body.panel-mode .panel-main {
+    padding: 16px 20px 32px;
+}

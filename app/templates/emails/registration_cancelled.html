@@ -1,0 +1,52 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Registration cancelled - {{ event.title }}{% endblock %}
+
+{% block content %}
+<p>Dear {{ registration.first_name }},</p>
+
+<p>
+    we are writing to let you know that your registration for
+    <strong>{{ event.title }}</strong> has been cancelled by the organiser.
+</p>
+
+{% if reason %}
+<div class="event-details">
+    <h3>Reason</h3>
+    <p style="margin:0;">{{ reason }}</p>
+</div>
+{% endif %}
+
+<div class="event-details">
+    <h3>Course details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Course:</span>
+        <span class="detail-value">{{ event.title }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Location:</span>
+        <span class="detail-value">{{ event.location }}{% if event.venue_name %} - {{ event.venue_name }}{% endif %}</span>
+    </div>
+</div>
+
+{% if registration.is_paid %}
+<p>
+    Our records show that your course fee has already been paid. We will contact you
+    shortly regarding the refund.
+</p>
+{% endif %}
+
+<p>
+    If you believe this is a mistake, or if you have any questions, simply reply to
+    this email and we will be happy to help.
+</p>
+
+<p>
+    Kind regards,<br>
+    <strong>{{ site_authors_line }}</strong>
+</p>
+{% endblock %}

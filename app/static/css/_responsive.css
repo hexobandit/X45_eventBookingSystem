@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Responsive — mobile-first corrections
+   Base styles are written mobile-first with fluid clamp() type; these
+   queries only restructure grids and navigation.
+   ========================================================================== */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+    .nav {
+        display: none;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .event-details-container {
+        grid-template-columns: 1fr;
+        gap: var(--sp-12);
+    }
+
+    .event-sidebar {
+        position: static;
+    }
+
+        .contact-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-12);
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+    /* Oversize past the viewport so no photo edge is ever visible; quieter
+       so the wordmark stays the hero */
+    .hero-photo {
+        width: 135vw;
+        opacity: 0.35;
+    }
+
+    .hero-manifesto {
+        flex-direction: column;
+        gap: var(--sp-4);
+    }
+
+    .hero-manifesto .bar {
+        width: 2.2rem;
+        height: 1px;
+    }
+
+    .course-row {
+        grid-template-columns: 4.5rem 1fr;
+        row-gap: var(--sp-2);
+    }
+
+    .course-date .day {
+        font-size: 1.6rem;
+    }
+
+    .course-status {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .course-arrow {
+        display: none;
+    }
+
+    .pay-options {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .about-authors {
+        grid-template-columns: 1fr;
+        gap: var(--sp-12);
+    }
+
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-8);
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+    }
+
+    .flash-messages {
+        align-items: stretch;
+    }
+
+    .flash {
+        max-width: none;
+    }
+}

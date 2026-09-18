@@ -1,0 +1,68 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}New registration - {{ event.title }}{% endblock %}
+
+{% block content %}
+<h2>New course registration</h2>
+
+<div class="event-details">
+    <h3>{{ event.title }}</h3>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Capacity:</span>
+        <span class="detail-value">{{ event.registered_count }}/{{ event.capacity }} ({{ event.spots_left }} left)</span>
+    </div>
+</div>
+
+<div class="event-details">
+    <h3>Attendee details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value">{{ registration.full_name }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Email:</span>
+        <span class="detail-value"><a href="mailto:{{ registration.email }}">{{ registration.email }}</a></span>
+    </div>
+    {% if registration.phone %}
+    <div class="detail-row">
+        <span class="detail-label">Phone:</span>
+        <span class="detail-value">{{ registration.phone }}</span>
+    </div>
+    {% endif %}
+    {% if registration.organization %}
+    <div class="detail-row">
+        <span class="detail-label">Organisation:</span>
+        <span class="detail-value">{{ registration.organization }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Status:</span>
+        <span class="detail-value">
+            {% if registration.status.value == 'waitlist' %}
+                <strong style="color: #1E40AF;">WAITING LIST</strong>
+            {% else %}
+                {{ registration.status.value }}
+            {% endif %}
+        </span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Registered:</span>
+        <span class="detail-value">{{ registration.created_at.strftime('%-d %B %Y %H:%M') }}</span>
+    </div>
+</div>
+
+{% if registration.notes %}
+<div class="event-details">
+    <h3>Notes</h3>
+    <p>{{ registration.notes }}</p>
+</div>
+{% endif %}
+
+<p style="text-align: center;">
+    <a href="{{ config.CANONICAL_DOMAIN }}/admin/" class="btn">Open admin</a>
+</p>
+{% endblock %}

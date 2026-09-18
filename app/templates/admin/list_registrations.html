@@ -1,0 +1,25 @@
+{% extends 'admin/list_with_heading.html' %}
+
+{# Registrations list: the row trash icon and the bulk "Delete" action open
+   the delete modal (reason + cancellation email) instead of the plain
+   confirm. master.html's generic delete/bulk handlers defer to the hooks
+   defined here. #}
+{% block tail %}
+    {{ super() }}
+    {% include 'admin/_delete_registration_modal.html' %}
+    <script>
+    (function () {
+        // Row delete: form.icon lives in the row; the participant name is in
+        // the first stacked identity cell (<strong>).
+        window.deleteRegistrationRowHook = function (form) {
+            var row = form.closest('tr');
+            var strong = row ? row.querySelector('td strong') : null;
+            window.openDeleteRegModal(form, { name: strong ? strong.textContent.trim() : '' });
+        };
+        // Bulk delete via "With selected" -> Delete
+        window.deleteRegistrationBulkHook = function (form, count) {
+            window.openDeleteRegModal(form, { count: count });
+        };
+    })();
+    </script>
+{% endblock %}

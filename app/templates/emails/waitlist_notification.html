@@ -1,0 +1,44 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Waiting list - {{ event.title }}{% endblock %}
+
+{% block content %}
+<p>Dear {{ registration.first_name }},</p>
+
+<p>thank you for your interest in <strong>{{ event.title }}</strong>.</p>
+
+<p>The course is currently fully booked. <strong>You have been added to the waiting list.</strong></p>
+
+<p>If a place becomes available, we will contact you right away with further information and a registration confirmation.</p>
+
+<div class="event-details">
+    <h3>Course details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    {% if event.end_date %}
+    <div class="detail-row">
+        <span class="detail-label">Ends:</span>
+        <span class="detail-value">{{ event.end_date.strftime('%-d %B %Y') }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Location:</span>
+        <span class="detail-value">{{ event.location }}{% if event.venue_name %} - {{ event.venue_name }}{% endif %}</span>
+    </div>
+    {% if event.price %}
+    <div class="detail-row">
+        <span class="detail-label">Price:</span>
+        <span class="detail-value">{{ event.formatted_price }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<p>If you have any questions, don't hesitate to contact us.</p>
+
+<p>
+    Kind regards,<br>
+    <strong>{{ site_authors_line }}</strong>
+</p>
+{% endblock %}

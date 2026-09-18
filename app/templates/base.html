@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if ga4_id %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ ga4_id }}');
+    </script>
+    {% endif %}
+
+    <meta name="description" content="{% block meta_description %}{{ site_description }}{% endblock %}">
+    <meta name="author" content="{{ site_authors|join(', ') }}">
+    <meta name="theme-color" content="#070809">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{% block canonical_url %}{{ canonical_domain }}{{ request.path }}{% endblock %}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}?v={{ asset_v }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}?v={{ asset_v }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}?v={{ asset_v }}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:url" content="{% block og_url %}{{ canonical_domain }}{{ request.path }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ canonical_domain }}{{ url_for('static', filename='img/og-default.png') }}{% endblock %}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ canonical_domain }}{{ url_for('static', filename='img/og-default.png') }}{% endblock %}">
+
+    <title>{% block title %}{{ site_name }} — {{ site_title_suffix }}{% endblock %}</title>
+
+    <!-- Fonts are self-hosted (see css/_fonts.css) — no external font requests -->
+    <link rel="preload" href="{{ url_for('static', filename='fonts/nunitosans-200-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/inter-var-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_fonts.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_variables.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_base.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_components.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_layout.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_pages.css') }}?v={{ asset_v }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/_responsive.css') }}?v={{ asset_v }}">
+
+    {% block extra_css %}{% endblock %}
+
+    <!-- Structured Data -->
+    {% block structured_data %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "{{ site_name }}",
+        "description": "{{ site_description }}",
+        "url": "{{ canonical_domain }}",
+        "founder": [
+            {% for a in site_authors %}{"@type": "Person", "name": "{{ a }}"}{{ ',' if not loop.last }}{% endfor %}
+        ]{% if instagram_url %},
+        "sameAs": ["{{ instagram_url }}"]{% endif %}
+    }
+    </script>
+    {% endblock %}
+</head>
+<body>
+    {% if demo_mode %}
+    <div class="demo-banner" role="note">
+        Demo site — every registration, payment and email here is simulated and the data is reset each night.
+        <a href="{{ url_for('admin_auth.login') }}">Open the admin</a> (admin@example.com / demo)
+    </div>
+    {% endif %}
+    <!-- Header -->
+    <header class="header" id="siteHeader">
+        <div class="header-inner">
+            <a href="{{ url_for('main.index') }}" class="logo" aria-label="{{ site_name }} — home">{{ site_name }}</a>
+            <nav class="nav" aria-label="Primary">
+                <a href="{{ url_for('main.courses') }}">Courses</a>
+                <a href="{{ url_for('main.about') }}">About</a>
+                <a href="{{ url_for('main.contact') }}">Contact</a>
+            </nav>
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false">
+                <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 1h22M0 7h22M0 13h22" stroke="currentColor" stroke-width="1"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="overlay-bg" id="overlayBg" onclick="toggleMenu()"></div>
+    <div class="menu-overlay" id="menuOverlay" aria-label="Menu">
+        <button class="menu-close" onclick="toggleMenu()" aria-label="Close menu">&times;</button>
+        <nav>
+            <a href="{{ url_for('main.index') }}">Home</a>
+            <a href="{{ url_for('main.courses') }}">Courses</a>
+            <a href="{{ url_for('main.about') }}">About</a>
+            <a href="{{ url_for('main.contact') }}">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages" id="flashMessages">
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}" onclick="this.remove()">{{ message }}</div>
+                {% endfor %}
+            </div>
+            <script>setTimeout(function(){var el=document.getElementById('flashMessages');if(el)el.style.opacity='0';setTimeout(function(){if(el)el.remove();},300);},8000);</script>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-brand">{{ site_name }}</div>
+                <p class="footer-tagline">{{ site_tagline }}</p>
+                <p class="footer-tagline">{{ site_authors_line }}</p>
+            </div>
+            <div>
+                <h4>Menu</h4>
+                <a href="{{ url_for('main.courses') }}">Courses</a>
+                <a href="{{ url_for('main.about') }}">About</a>
+                <a href="{{ url_for('main.contact') }}">Contact</a>
+            </div>
+            <div>
+                <h4>Follow</h4>
+                {% if instagram_url %}<a href="{{ instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a>{% endif %}
+                <a href="{{ url_for('main.contact') }}">Write to us</a>
+                <a href="{{ url_for('main.privacy') }}">Privacy policy</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; {{ current_year }} {{ site_name }}. All rights reserved.</span>
+            <span>{{ site_tagline }}</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ asset_v }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

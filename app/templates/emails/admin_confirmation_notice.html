@@ -1,0 +1,55 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Registration confirmed - {{ event.title }}{% endblock %}
+
+{% block content %}
+<h2>A registration has been confirmed</h2>
+
+<div class="event-details">
+    <h3>{{ event.title }}</h3>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Capacity:</span>
+        <span class="detail-value">{{ event.registered_count }}/{{ event.capacity }} ({{ event.spots_left }} left)</span>
+    </div>
+</div>
+
+<div class="event-details">
+    <h3>Attendee details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Name:</span>
+        <span class="detail-value">{{ registration.full_name }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Email:</span>
+        <span class="detail-value"><a href="mailto:{{ registration.email }}">{{ registration.email }}</a></span>
+    </div>
+    {% if registration.phone %}
+    <div class="detail-row">
+        <span class="detail-label">Phone:</span>
+        <span class="detail-value">{{ registration.phone }}</span>
+    </div>
+    {% endif %}
+    {% if registration.organization %}
+    <div class="detail-row">
+        <span class="detail-label">Organisation:</span>
+        <span class="detail-value">{{ registration.organization }}</span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Status:</span>
+        <span class="detail-value">{{ registration.status.value }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Confirmed:</span>
+        <span class="detail-value">{{ registration.confirmed_at.strftime('%-d %B %Y %H:%M') if registration.confirmed_at else 'N/A' }}</span>
+    </div>
+</div>
+
+<p style="text-align: center;">
+    <a href="{{ config.CANONICAL_DOMAIN }}/admin/" class="btn">Open admin</a>
+</p>
+{% endblock %}

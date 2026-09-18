@@ -1,0 +1,140 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Payment details - {{ event.title }}{% endblock %}
+
+{% block content %}
+<p>Dear {{ registration.first_name }},</p>
+
+<p>
+    thank you for registering for <strong>{{ event.title }}</strong>.
+    Below you will find the payment details for the course fee.
+</p>
+
+{% set vs = registration.variable_symbol or event.payment_variable_symbol %}
+{% set both = event.has_domestic_payment and event.has_sepa_payment %}
+{% if both %}
+<p>You can pay either by a domestic Czech transfer in CZK or by a SEPA transfer in EUR — choose whichever is more convenient for you.</p>
+{% endif %}
+
+{% if event.has_domestic_payment %}
+<div class="event-details">
+    <h3>{% if both %}Option 1 — {% endif %}Bank transfer in CZK (Czech account)</h3>
+    <div class="detail-row">
+        <span class="detail-label">Account number:</span>
+        <span class="detail-value"><strong>{{ event.payment_bank_account }}</strong></span>
+    </div>
+    {% if vs %}
+    <div class="detail-row">
+        <span class="detail-label">Variable symbol:</span>
+        <span class="detail-value"><strong>{{ vs }}</strong></span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Amount:</span>
+        <span class="detail-value"><strong>{{ event.formatted_domestic_amount }}</strong></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Due date:</span>
+        <span class="detail-value"><strong>{{ due_date.strftime('%-d %B %Y') }}</strong></span>
+    </div>
+    {% if 'domestic' in qr_kinds %}
+    <div style="text-align: center; margin: 16px 0 4px;">
+        <p style="margin-bottom: 8px; color: #5D6771; font-weight: 600;">Scan with your Czech banking app (QR platba):</p>
+        <img src="{{ qr_src.domestic if qr_src else 'cid:qr_domestic' }}" alt="QR payment (CZK)" style="max-width: 200px; border-radius: 8px;">
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if event.has_sepa_payment %}
+<div class="event-details">
+    <h3>{% if both %}Option 2 — {% endif %}SEPA transfer in EUR</h3>
+    <div class="detail-row">
+        <span class="detail-label">Account holder:</span>
+        <span class="detail-value"><strong>{{ event.payment_beneficiary_name }}</strong></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">IBAN:</span>
+        <span class="detail-value"><strong>{{ event.payment_sepa_iban }}</strong></span>
+    </div>
+    {% if event.payment_sepa_bic %}
+    <div class="detail-row">
+        <span class="detail-label">BIC / SWIFT:</span>
+        <span class="detail-value"><strong>{{ event.payment_sepa_bic }}</strong></span>
+    </div>
+    {% endif %}
+    {% if vs %}
+    <div class="detail-row">
+        <span class="detail-label">Payment reference:</span>
+        <span class="detail-value"><strong>VS {{ vs }} {{ registration.full_name }}</strong></span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Amount:</span>
+        <span class="detail-value"><strong>{{ event.formatted_sepa_amount }}</strong></span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Due date:</span>
+        <span class="detail-value"><strong>{{ due_date.strftime('%-d %B %Y') }}</strong></span>
+    </div>
+    {% if 'sepa' in qr_kinds %}
+    <div style="text-align: center; margin: 16px 0 4px;">
+        <p style="margin-bottom: 8px; color: #5D6771; font-weight: 600;">Scan with your banking app (SEPA / EPC QR):</p>
+        <img src="{{ qr_src.sepa if qr_src else 'cid:qr_sepa' }}" alt="QR payment (EUR)" style="max-width: 200px; border-radius: 8px;">
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if not event.has_domestic_payment and not event.has_sepa_payment %}
+<div class="event-details">
+    <h3>Payment details</h3>
+    {% if vs %}
+    <div class="detail-row">
+        <span class="detail-label">Variable symbol:</span>
+        <span class="detail-value"><strong>{{ vs }}</strong></span>
+    </div>
+    {% endif %}
+    {% if event.formatted_payment_amount %}
+    <div class="detail-row">
+        <span class="detail-label">Amount:</span>
+        <span class="detail-value"><strong>{{ event.formatted_payment_amount }}</strong></span>
+    </div>
+    {% endif %}
+    <div class="detail-row">
+        <span class="detail-label">Due date:</span>
+        <span class="detail-value"><strong>{{ due_date.strftime('%-d %B %Y') }}</strong></span>
+    </div>
+</div>
+{% endif %}
+
+{% if event.payment_instructions %}
+<div class="event-details">
+    <h3>Additional information</h3>
+    <p>{{ event.payment_instructions }}</p>
+</div>
+{% endif %}
+
+<div class="event-details">
+    <h3>Course details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Course:</span>
+        <span class="detail-value">{{ event.title }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Location:</span>
+        <span class="detail-value">{{ event.location }}{% if event.venue_name %} - {{ event.venue_name }}{% endif %}</span>
+    </div>
+</div>
+
+<p>If you have any questions, don't hesitate to contact us.</p>
+
+<p>
+    Kind regards,<br>
+    <strong>{{ site_authors_line }}</strong>
+</p>
+{% endblock %}

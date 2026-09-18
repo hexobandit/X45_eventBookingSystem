@@ -1,0 +1,46 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Reminder - {{ event.title }}{% endblock %}
+
+{% block content %}
+<p>Dear {{ registration.first_name }},</p>
+
+<p>
+    we would like to remind you that <strong>{{ event.title }}</strong> takes place
+    {% if days_before == 1 %}
+    <strong>tomorrow</strong>!
+    {% else %}
+    <strong>in {{ days_before }} days</strong>.
+    {% endif %}
+</p>
+
+<div class="event-details">
+    <h3>Course details</h3>
+    <div class="detail-row">
+        <span class="detail-label">Date:</span>
+        <span class="detail-value">{{ event.formatted_date }}</span>
+    </div>
+    <div class="detail-row">
+        <span class="detail-label">Location:</span>
+        <span class="detail-value">{{ event.location }}{% if event.venue_name %} - {{ event.venue_name }}{% endif %}</span>
+    </div>
+</div>
+
+<h3>Don't forget to bring</h3>
+<ul>
+    <li>Your registration confirmation</li>
+    <li>A notebook and something to write with</li>
+    {% if 'hands-on' in event.title.lower() or 'workshop' in event.event_type.lower() %}
+    <li>Comfortable clothing suitable for practical work</li>
+    {% endif %}
+</ul>
+
+<p>If you have any questions, don't hesitate to contact us.</p>
+
+<p>We look forward to seeing you!</p>
+
+<p>
+    Kind regards,<br>
+    <strong>{{ site_authors_line }}</strong>
+</p>
+{% endblock %}

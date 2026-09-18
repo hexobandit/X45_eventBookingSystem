@@ -1,0 +1,208 @@
+{# Delete-registration dialog. Exposes window.openDeleteRegModal(form, opts):
+     form  — the <form> to submit (Flask-Admin delete row form, the edit-page
+             delete form, or the bulk #action_form)
+     opts  — {name: 'Jane Smith', count: 3}
+   On confirm the reason/email flags are appended to the form as hidden
+   inputs and the form is submitted natively. #}
+<div class="manage-overlay" id="deleteRegModal" role="dialog" aria-modal="true" aria-labelledby="deleteRegTitle">
+    <div class="manage-modal del-modal">
+        <div class="manage-modal-head">
+            <h5 id="deleteRegTitle">Delete registration</h5>
+            <button type="button" class="manage-modal-close" id="deleteRegCloseX" aria-label="Close">&times;</button>
+        </div>
+        <div class="manage-modal-body del-body">
+            <p class="del-intro" id="deleteRegIntro"></p>
+
+            <div class="form-group del-reason">
+                <label for="deleteRegReason">Reason <span class="del-optional">optional &middot; kept with the archived record</span></label>
+                <textarea id="deleteRegReason" rows="2" maxlength="500"
+                          placeholder="Duplicate registration, participant asked to cancel, no-show…"></textarea>
+            </div>
+
+            <div class="del-options">
+                <label class="del-option" for="deleteRegSendEmail">
+                    <input type="checkbox" id="deleteRegSendEmail" checked>
+                    <span class="del-option-text">
+                        <span class="del-option-title">Email the participant</span>
+                        <span class="del-option-desc">Sends "Your registration for … has been cancelled by the organiser."</span>
+                    </span>
+                </label>
+                <label class="del-option del-option-sub" for="deleteRegIncludeReason" id="deleteRegIncludeWrap">
+                    <input type="checkbox" id="deleteRegIncludeReason">
+                    <span class="del-option-text">
+                        <span class="del-option-title">Include the reason in the email</span>
+                    </span>
+                </label>
+            </div>
+
+            <p class="del-note">
+                The record is kept under <a href="{{ url_for('admin_deleted_registrations.index_view') }}" target="_blank" rel="noopener">Deleted registrations</a>
+                and the email address can register again for this course.
+            </p>
+        </div>
+        <div class="manage-modal-foot">
+            <button type="button" class="btn btn-secondary btn-sm" id="deleteRegCancelBtn">Cancel</button>
+            <button type="button" class="btn btn-sm btn-destructive" id="deleteRegOkBtn">Delete registration</button>
+        </div>
+    </div>
+</div>
+<style>
+.del-modal { max-width: 480px; }
+.del-intro {
+    margin: 0 0 18px;
+    font-size: 0.92rem;
+    color: var(--admin-text);
+    line-height: 1.5;
+}
+.del-intro strong { font-weight: 700; }
+.del-reason label { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.del-optional { font-weight: 400; font-size: 0.74rem; color: var(--admin-text-muted); }
+.manage-modal-body .del-reason textarea { min-height: 64px; }
+.del-options {
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.manage-modal-body .del-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0;
+    padding: 12px 14px;
+    font-weight: 400;
+    color: var(--admin-text);
+    cursor: pointer;
+    transition: background 0.12s ease;
+}
+.manage-modal-body .del-option:hover { background: var(--admin-bg-subtle); }
+.manage-modal-body .del-option + .del-option { border-top: 1px solid var(--admin-border-light); }
+.manage-modal-body .del-option-sub { padding-left: 40px; }
+.manage-modal-body .del-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    padding: 0;
+    flex: 0 0 auto;
+    accent-color: var(--admin-accent);
+    cursor: pointer;
+}
+.del-option-text { display: flex; flex-direction: column; gap: 2px; }
+.del-option-title { font-size: 0.88rem; font-weight: 600; color: var(--admin-text); }
+.del-option-desc { font-size: 0.78rem; color: var(--admin-text-muted); line-height: 1.4; }
+.del-options.email-off .del-option-sub { opacity: 0.45; pointer-events: none; }
+.del-note {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--admin-text-muted);
+}
+.admin-main .btn-destructive {
+    background: var(--accent-red);
+    border: 1px solid var(--accent-red);
+    color: #fff;
+    font-weight: 600;
+}
+.admin-main .btn-destructive:hover,
+.admin-main .btn-destructive:focus {
+    background: #b91c1c;
+    border-color: #b91c1c;
+    color: #fff;
+}
+.admin-main .btn-destructive:focus-visible { outline: 2px solid var(--accent-red); outline-offset: 2px; }
+</style>
+<script>
+(function(){
+    var modal    = document.getElementById('deleteRegModal');
+    var intro    = document.getElementById('deleteRegIntro');
+    var reason   = document.getElementById('deleteRegReason');
+    var sendCb   = document.getElementById('deleteRegSendEmail');
+    var inclCb   = document.getElementById('deleteRegIncludeReason');
+    var options  = modal.querySelector('.del-options');
+    var okBtn    = document.getElementById('deleteRegOkBtn');
+    var pendingForm = null;
+    var lastFocus = null;
+
+    function syncInclude() {
+        options.classList.toggle('email-off', !sendCb.checked);
+        inclCb.disabled = !sendCb.checked;
+        if (!sendCb.checked) inclCb.checked = false;
+    }
+    sendCb.addEventListener('change', syncInclude);
+
+    function setIntro(opts) {
+        var count = opts.count || 1;
+        intro.textContent = '';
+        if (count > 1) {
+            intro.appendChild(document.createTextNode('Delete the '));
+            var b = document.createElement('strong'); b.textContent = count + ' selected registrations';
+            intro.appendChild(b);
+            intro.appendChild(document.createTextNode('? Each one is archived and, if chosen below, notified by email.'));
+        } else {
+            intro.appendChild(document.createTextNode('Delete the registration of '));
+            var n = document.createElement('strong'); n.textContent = opts.name || 'this participant';
+            intro.appendChild(n);
+            intro.appendChild(document.createTextNode('?'));
+        }
+    }
+
+    window.openDeleteRegModal = function(form, opts) {
+        opts = opts || {};
+        pendingForm = form;
+        lastFocus = document.activeElement;
+        document.getElementById('deleteRegTitle').textContent =
+            (opts.count || 1) > 1 ? 'Delete ' + opts.count + ' registrations' : 'Delete registration';
+        okBtn.textContent = (opts.count || 1) > 1 ? 'Delete ' + opts.count + ' registrations' : 'Delete registration';
+        setIntro(opts);
+        reason.value = '';
+        sendCb.checked = true;
+        inclCb.checked = false;
+        syncInclude();
+        modal.classList.add('active');
+        setTimeout(function(){ reason.focus(); }, 50);
+    };
+
+    function closeModal() {
+        modal.classList.remove('active');
+        pendingForm = null;
+        if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    function hidden(form, name, value) {
+        var el = form.querySelector('input[name="' + name + '"]');
+        if (!el) {
+            el = document.createElement('input');
+            el.type = 'hidden';
+            el.name = name;
+            form.appendChild(el);
+        }
+        el.value = value;
+    }
+
+    okBtn.addEventListener('click', function(){
+        var form = pendingForm;
+        if (!form) return;
+        hidden(form, 'delete_reason', reason.value.trim());
+        hidden(form, 'send_cancel_email', sendCb.checked ? '1' : '');
+        hidden(form, 'include_reason', (sendCb.checked && inclCb.checked) ? '1' : '');
+        okBtn.disabled = true;
+        modal.classList.remove('active');
+        pendingForm = null;
+        var submitBtn = form.querySelector('[type="submit"]');
+        if (submitBtn) submitBtn.removeAttribute('onclick');
+        form.submit();
+    });
+
+    // Enter inside the reason field confirms (Shift+Enter = newline)
+    reason.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); okBtn.click(); }
+    });
+
+    document.getElementById('deleteRegCloseX').addEventListener('click', closeModal);
+    document.getElementById('deleteRegCancelBtn').addEventListener('click', closeModal);
+    modal.addEventListener('mousedown', function(e){ if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+})();
+</script>

@@ -1,0 +1,36 @@
+# Flask and extensions
+Flask>=3.0.0
+Flask-SQLAlchemy>=3.1.1
+Flask-Migrate>=4.0.5
+Flask-WTF>=1.2.1
+Flask-Login>=0.6.3
+Flask-Limiter>=3.5.0
+Flask-Bcrypt>=1.0.1
+Flask-Admin>=1.6.1
+
+# Database
+SQLAlchemy>=2.0.36
+psycopg2-binary>=2.9.9  # PostgreSQL driver (production database)
+
+# Email encryption
+cryptography>=42.0.0
+
+# Export (XLSX, PDF)
+tablib[xlsx]>=3.5.0
+openpyxl>=3.1.0
+fpdf2>=2.7.0
+
+# Utilities
+python-slugify>=8.0.1
+python-dotenv>=1.0.0
+email-validator>=2.0.0
+
+# Security
+bcrypt>=4.1.2
+
+# Payments
+stripe>=10.0.0
+qrcode[pil]>=7.4
+
+# Production server
+gunicorn>=21.2.0

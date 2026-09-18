@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Courses | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ site_description }}{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <span class="eyebrow">Programme</span>
+    <h1>Courses</h1>
+    <p class="lead">Small groups, real cases, everyday materials. Theory in the morning — composite in your hands for the rest of the day.</p>
+</header>
+
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        {% if events %}
+        <div class="course-list">
+            {% for event in events %}
+            <a href="{{ url_for('main.course_detail', slug=event.slug) }}" class="course-row">
+                <span class="course-date">
+                    <span class="day">{{ event.event_date.day }}</span>
+                    <span class="month">{{ event.month_display[:3] }}</span>
+                    <span class="year">{{ event.event_date.year }}</span>
+                </span>
+                <span class="course-info">
+                    <h3>{{ event.title }}</h3>
+                    <span class="course-meta">
+                        <span>{{ event.event_type|capitalize }}</span>
+                        <span>{{ event.location }}{% if event.venue_name %} — {{ event.venue_name }}{% endif %}</span>
+                        <span>{{ event.formatted_price }}</span>
+                    </span>
+                </span>
+                <span class="course-status{% if event.is_full %} is-full{% elif event.spots_left <= 3 %} is-low{% endif %}">
+                    {% if event.is_full %}
+                        {% if event.can_join_waitlist %}Waiting list{% else %}Fully booked{% endif %}
+                    {% elif event.registration_not_yet_open %}
+                        Opens soon
+                    {% elif event.spots_left <= 3 %}
+                        {{ event.spots_left }} seat{{ 's' if event.spots_left != 1 }} left
+                    {% else %}
+                        Open
+                    {% endif %}
+                </span>
+                <span class="course-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="courses-empty">
+            New course dates are being prepared.<br>
+            <a href="{{ url_for('main.contact') }}">Get in touch</a> to hear about them first.
+        </p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

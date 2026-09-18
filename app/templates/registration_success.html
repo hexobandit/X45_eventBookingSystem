@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Registration received | {{ site_name }}{% endblock %}
+{% block meta_description %}Your registration has been received.{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">&#10003;</span>
+        <h1>Thank you, {{ registration.first_name }}</h1>
+        <p>Your registration for <strong>{{ registration.event.title }}</strong> has been received.</p>
+
+        <ol class="status-steps">
+            <li>
+                <span>
+                    <strong>Check your email</strong><br>
+                    We sent a confirmation email to <strong>{{ registration.email }}</strong>.
+                    If you can't find it, check your spam folder.
+                </span>
+            </li>
+            <li>
+                <span>
+                    <strong>Confirm your attendance</strong><br>
+                    Click the confirmation link in the email to secure your seat.
+                </span>
+            </li>
+            <li>
+                <span>
+                    <strong>Payment</strong><br>
+                    {% if registration.is_paid %}
+                        Your payment has been received — you're all set.
+                    {% elif registration.payment_method and registration.payment_method.value == 'card' %}
+                        You can pay securely by card, or wait for the bank transfer details by email.
+                    {% else %}
+                        After you confirm, we will email you the bank transfer details with a QR code.
+                    {% endif %}
+                </span>
+            </li>
+        </ol>
+
+        {% if not registration.is_paid and registration.event.payment_amount_display and config.get('STRIPE_SECRET_KEY') %}
+        <div class="status-actions" style="margin-bottom: 8px;">
+            <a href="{{ url_for('main.pay_registration', token=registration.confirmation_token) }}" class="btn btn-primary">
+                Pay {{ registration.event.formatted_payment_amount }} by card
+            </a>
+        </div>
+        <p class="status-note">Card payment is handled securely by Stripe.</p>
+        {% endif %}
+
+        <div class="status-detail">
+            <div class="info-item">
+                <span class="info-label">Course</span>
+                <span class="info-value">{{ registration.event.title }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date</span>
+                <span class="info-value">{{ registration.event.formatted_date }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location</span>
+                <span class="info-value">{{ registration.event.location }}</span>
+            </div>
+        </div>
+
+        {% if demo_mode %}
+        <div class="demo-callout">
+            <strong>Demo:</strong> no email was actually sent. See what the attendee would receive:
+            <a href="{{ url_for('main.registration_email_preview', token=registration.confirmation_token, kind='confirmation') }}" target="_blank" rel="noopener">confirmation email</a> ·
+            <a href="{{ url_for('main.registration_email_preview', token=registration.confirmation_token, kind='payment') }}" target="_blank" rel="noopener">payment details with QR</a> ·
+            <a href="{{ url_for('main.registration_email_preview', token=registration.confirmation_token, kind='reminder') }}" target="_blank" rel="noopener">reminder</a>.
+            Or <a href="{{ url_for('main.confirm_registration', token=registration.confirmation_token) }}">confirm your seat now</a> as if you had clicked the link.
+        </div>
+        {% endif %}
+
+        <div class="status-actions">
+            <a href="{{ url_for('main.courses') }}" class="btn">More courses</a>
+            <a href="{{ url_for('main.index') }}" class="btn">Back to home</a>
+        </div>
+
+        <p class="status-note">Questions? <a href="{{ url_for('main.contact') }}">Write to us</a>.</p>
+    </div>
+</section>
+{% endblock %}

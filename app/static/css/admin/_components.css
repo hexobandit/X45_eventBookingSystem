@@ -1,0 +1,123 @@
+/* ==========================================================================
+   Admin Components - Cards, Tables, Badges, Buttons, Forms, Empty States
+   ========================================================================== */
+
+/* ---- Cards ---- */
+.dash-card {
+    background: var(--admin-bg-card);
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow-sm);
+    border: 1px solid var(--admin-border);
+    overflow: hidden;
+}
+.dash-card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--admin-border-medium);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.dash-card-header h5 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+.dash-card-header a {
+    font-size: 0.8rem;
+    color: var(--admin-accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+.dash-card-header a:hover {
+    color: var(--admin-primary);
+}
+.dash-card-body {
+    padding: 0;
+}
+
+/* ---- Tables ---- */
+.reg-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.reg-table th {
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: var(--admin-bg-subtle);
+    border-bottom: 1px solid var(--admin-border-medium);
+}
+.reg-table td {
+    padding: 13px 20px;
+    font-size: 0.85rem;
+    color: var(--admin-text-secondary);
+    border-bottom: 1px solid var(--admin-border-light);
+}
+.reg-table tr:last-child td {
+    border-bottom: none;
+}
+.reg-table tr:hover td {
+    background: var(--admin-bg-subtle);
+}
+.reg-table .name-cell {
+    font-weight: 600;
+    color: var(--admin-text);
+}
+
+/* ---- Status Badges ---- */
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: var(--admin-radius-pill);
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.badge-pending   { background: var(--status-pending-bg);   color: var(--status-pending-text); }
+.badge-confirmed { background: var(--status-confirmed-bg); color: var(--status-confirmed-text); }
+.badge-cancelled { background: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
+.badge-waitlist  { background: var(--status-waitlist-bg);  color: var(--status-waitlist-text); }
+
+/* ---- Buttons ---- */
+.btn-brand {
+    background: var(--admin-accent);
+    color: var(--admin-primary);
+    font-weight: 600;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-brand:hover {
+    background: var(--admin-accent-bright);
+    color: var(--admin-primary);
+}
+.btn-brand-outline {
+    background: var(--admin-bg-card);
+    color: var(--admin-accent-deep);
+    border: 1px solid var(--admin-border-input);
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-brand-outline:hover {
+    background: var(--admin-accent);
+    color: var(--admin-primary);
+    border-color: var(--admin-accent);
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+    padding: 40px 24px;
+    text-align: center;
+    color: var(--admin-text-muted);
+}
+.empty-state p {
+    margin: 0;
+    font-size: 0.88rem;
+}

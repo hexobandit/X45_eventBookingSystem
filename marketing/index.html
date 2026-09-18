@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web a rezervační systém pro kurzy a workshopy | Roman Solutions</title>
+    <meta name="description" content="Web pro vaše kurzy, který sám vybírá přihlášky, hlídá kapacitu a inkasuje platby. Vlastní doména, bez provize, platby přímo na váš účet. Pro lektory, ordinace a školicí firmy.">
+    <link rel="canonical" href="https://romansolutions.cz/">
+    <meta name="theme-color" content="#16243A">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="cs_CZ">
+    <meta property="og:site_name" content="Roman Solutions">
+    <meta property="og:title" content="Web pro vaše kurzy, který sám vybírá přihlášky, hlídá kapacitu a inkasuje platby">
+    <meta property="og:description" content="Vlastní doména, bez provize z přihlášky, platby přímo na váš účet. Pro lektory, ordinace a školicí firmy.">
+    <meta property="og:url" content="https://romansolutions.cz/">
+    <meta property="og:image" content="https://romansolutions.cz/img/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <!-- TODO before launch: self-host the font (GDPR) — download Bricolage Grotesque to fonts/ and switch to @font-face -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20260918">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "Roman Solutions",
+          "url": "https://romansolutions.cz/",
+          "email": "info@romansolutions.cz",
+          "areaServed": "CZ"
+        },
+        {
+          "@type": "Service",
+          "name": "Web a rezervační systém pro kurzy",
+          "serviceType": "Web development, course booking and payment system",
+          "provider": { "@type": "Organization", "name": "Roman Solutions" },
+          "areaServed": "CZ",
+          "description": "Web pro kurzy a workshopy s registrací účastníků, hlídáním kapacity, čekací listinou, platbami kartou i převodem s QR kódem a automatickou e-mailovou komunikací.",
+          "url": "https://romansolutions.cz/"
+        }
+      ]
+    }
+    </script>
+</head>
+<body>
+
+<header class="top">
+    <a class="brand" href="/">Roman<span>Solutions</span></a>
+    <nav class="top-nav" aria-label="Hlavní">
+        <a href="#jak">Jak to funguje</a>
+        <a href="#umi">Co umí</a>
+        <a href="#spoluprace">Spolupráce</a>
+        <a href="#faq">Otázky</a>
+        <a class="btn btn-ghost" href="https://demo.romansolutions.cz" data-demo target="_blank" rel="noopener">Vyzkoušet demo</a>
+    </nav>
+</header>
+
+<main>
+
+<!-- ============================================================ Hero -->
+<section class="hero">
+    <div class="hero-text">
+        <p class="hero-kicker">Web + rezervace + platby pro pořadatele kurzů</p>
+        <h1>Web pro vaše kurzy, který sám vybírá přihlášky, hlídá kapacitu a&nbsp;inkasuje platby.</h1>
+        <p class="lead">Pro lektory, ordinace a školicí firmy, které pořádají několik kurzů ročně a dnes to řeší přes e‑mail, Excel a bankovní výpis.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="https://demo.romansolutions.cz" data-demo target="_blank" rel="noopener">Vyzkoušet demo</a>
+            <a class="btn btn-ghost" href="#poptavka">Nezávazně poptat</a>
+        </div>
+        <p class="hero-note">Vlastní doména. Bez provize z přihlášky. Platby přímo na váš účet.</p>
+    </div>
+
+    <!-- The one animated moment: a bank statement line arrives, matches by
+         variable symbol, and the registration gets stamped ZAPLACENO. -->
+    <figure class="ledger" aria-label="Ukázka: platba z výpisu se sama spáruje s registrací">
+        <div class="ledger-head">
+            <span class="ledger-title">Registrace · Studio Lighting Masterclass</span>
+            <span class="ledger-cap">5 / 6 míst</span>
+        </div>
+        <table class="ledger-table">
+            <colgroup><col class="c-name"><col class="c-vs"><col class="c-state"><col class="c-pay"></colgroup>
+            <thead>
+                <tr><th>Účastník</th><th>VS</th><th>Stav</th><th>Platba</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Jana Dvořáková</td><td class="num">2026001</td><td><span class="pill ok">potvrzeno</span></td><td><span class="pill paid">zaplaceno</span></td>
+                </tr>
+                <tr id="ledgerTarget">
+                    <td>Tomáš Král</td><td class="num">2026002</td><td><span class="pill ok">potvrzeno</span></td>
+                    <td class="stamp-cell"><span class="pill wait" data-before>čeká</span><span class="stamp" data-after>Zaplaceno</span></td>
+                </tr>
+                <tr>
+                    <td>Petra Svobodová</td><td class="num">2026003</td><td><span class="pill ok">potvrzeno</span></td><td><span class="pill wait">čeká</span></td>
+                </tr>
+                <tr>
+                    <td>Martin Beneš</td><td class="num">—</td><td><span class="pill list">čekací listina</span></td><td class="muted">—</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="statement" id="statementLine" aria-hidden="true">
+            <span class="statement-label">Příchozí platba</span>
+            <span class="statement-amt num">12 900,00 Kč</span>
+            <span class="statement-vs num">VS 2026002</span>
+        </div>
+        <figcaption>Platba dorazí na váš účet, systém ji podle variabilního symbolu přiřadí k&nbsp;přihlášce a pošle účastníkovi potvrzení. Vy neděláte nic.</figcaption>
+    </figure>
+</section>
+
+<!-- ============================================================ Problem -->
+<section class="section problem" id="problem">
+    <h2>Přihlášky v e‑mailu, seznam v Excelu, platby ve výpisu.</h2>
+    <div class="problem-grid">
+        <div>
+            <h3>„Je ještě místo?"</h3>
+            <p>Odpovídáte na to samé desetkrát týdně. Mezitím se dva lidé přihlásí na poslední místo a jeden z nich se to dozví až od vás.</p>
+        </div>
+        <div>
+            <h3>Kdo zaplatil a kdo ne</h3>
+            <p>Procházíte výpis, hledáte jména a částky, pak to přepisujete do tabulky. Před kurzem stejně voláte těm, co nezaplatili.</p>
+        </div>
+        <div>
+            <h3>Potvrzení, připomínky, informace k místu</h3>
+            <p>Každému zvlášť, ručně, večer po ordinaci. Když se termín posune, píšete všem znovu.</p>
+        </div>
+    </div>
+    <p class="problem-close">Nic z toho není vaše práce. Vaše práce je učit.</p>
+</section>
+
+<!-- ============================================================ How -->
+<section class="section how" id="jak">
+    <h2>Tři kroky, žádná ruční práce.</h2>
+    <ol class="steps">
+        <li>
+            <div class="step-text">
+                <h3>Účastník se přihlásí</h3>
+                <p>Na stránce kurzu vidí program, lektora, cenu a kolik míst zbývá. Když je plno, zapíše se na čekací listinu.</p>
+            </div>
+            <div class="mock mock-course" aria-hidden="true">
+                <div class="mock-bar"></div>
+                <div class="mock-title">Studio Lighting Masterclass</div>
+                <div class="mock-meta"><span>14.–15. 10. 2026</span><span>Praha</span><span>12 900 Kč</span></div>
+                <div class="mock-line w80"></div><div class="mock-line w60"></div>
+                <div class="mock-row"><span class="mock-cap">Zbývá 1 místo</span><span class="mock-btn">Přihlásit se</span></div>
+            </div>
+        </li>
+        <li>
+            <div class="step-text">
+                <h3>Přijde mu potvrzení a platební údaje</h3>
+                <p>E‑mail s QR kódem pro bankovní aplikaci a variabilním symbolem, nebo platba kartou rovnou při přihlášce.</p>
+            </div>
+            <div class="mock mock-mail" aria-hidden="true">
+                <div class="mock-from">Studio Lumen · Platební údaje k vaší registraci</div>
+                <div class="mock-mailbody">
+                    <div>
+                        <div class="mock-line w90"></div><div class="mock-line w70"></div>
+                        <div class="mock-kv"><span>Částka</span><b>12 900 Kč</b></div>
+                        <div class="mock-kv"><span>VS</span><b>2026002</b></div>
+                        <div class="mock-kv"><span>Splatnost</span><b>10 dní</b></div>
+                    </div>
+                    <div class="mock-qr" role="img" aria-label="QR kód platby"></div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="step-text">
+                <h3>Vy vidíte zaplaceno</h3>
+                <p>V administraci máte seznam účastníků, stav plateb, export pro účetní a jedno tlačítko na připomínku před kurzem.</p>
+            </div>
+            <div class="mock mock-admin" aria-hidden="true">
+                <div class="mock-adminrow head"><span>Účastník</span><span>Stav</span><span>Platba</span></div>
+                <div class="mock-adminrow"><span>Jana Dvořáková</span><span class="pill ok">potvrzeno</span><span class="pill paid">zaplaceno</span></div>
+                <div class="mock-adminrow"><span>Tomáš Král</span><span class="pill ok">potvrzeno</span><span class="pill paid">zaplaceno</span></div>
+                <div class="mock-adminrow"><span>Petra Svobodová</span><span class="pill ok">potvrzeno</span><span class="pill wait">čeká</span></div>
+                <div class="mock-row"><span class="mock-cap">Export XLSX</span><span class="mock-cap">Připomenout všem</span></div>
+            </div>
+        </li>
+    </ol>
+    <p class="how-cta"><a class="btn btn-primary" href="https://demo.romansolutions.cz" data-demo target="_blank" rel="noopener">Projít si to v demu</a> <span class="how-note">Zkušební kurzy, zkušební platby, e‑maily se zobrazí přímo v prohlížeči.</span></p>
+</section>
+
+<!-- ============================================================ Features -->
+<section class="section features" id="umi">
+    <h2>Víc než přihlašovací formulář.</h2>
+    <dl class="feature-list">
+        <div>
+            <dt>Prodejní stránky kurzů</dt>
+            <dd>Obsah, program, lektoři, fotky, co se účastník naučí. Marketingový web, ne jen formulář. Upravujete sami ve vizuálním editoru.</dd>
+        </div>
+        <div>
+            <dt>Rezervace míst</dt>
+            <dd>Kapacita se hlídá sama, i když se dva lidé přihlásí ve stejnou vteřinu. Čekací listina, časované otevření prodeje s odpočtem, možnost napojit externí registraci partnera.</dd>
+        </div>
+        <div>
+            <dt>Platby</dt>
+            <dd>Karta (Stripe) i převod s QR kódem — český QR platba v Kč i evropský SEPA v eurech. Párování přes variabilní symbol, přehled zaplaceno / nezaplaceno, platby chodí přímo na váš účet.</dd>
+        </div>
+        <div>
+            <dt>Komunikace</dt>
+            <dd>Automatické potvrzení přihlášky, platební údaje, připomínka před kurzem, potvrzení platby. Hromadné zprávy všem účastníkům kurzu. Každý odeslaný e‑mail je dohledatelný v logu.</dd>
+        </div>
+        <div>
+            <dt>Administrace účastníků</dt>
+            <dd>Export do Excelu / CSV / PDF, fakturační údaje, poznámky, audit kdo co změnil. Smazané registrace končí v archivu s důvodem — GDPR bez tabulek bokem.</dd>
+        </div>
+    </dl>
+</section>
+
+<!-- ============================================================ Compare -->
+<section class="section compare" id="srovnani">
+    <h2>Platformy jsou skvělé na jednorázové akce. Tohle je pro lidi, kteří učí opakovaně.</h2>
+    <div class="table-wrap">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col" class="us">Váš web od nás</th>
+                    <th scope="col">Eventbrite a podobné</th>
+                    <th scope="col">SimplyBook, Reservio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><th scope="row">Provize z každé přihlášky</th><td class="us">žádná</td><td>ano, z každé vstupenky</td><td>měsíční licence podle funkcí</td></tr>
+                <tr><th scope="row">Vlastní doména a vzhled</th><td class="us">ano, celý web je váš</td><td>stránka na jejich doméně</td><td>omezeně, jejich šablony</td></tr>
+                <tr><th scope="row">Platba převodem s QR a VS</th><td class="us">ano</td><td>ne</td><td>většinou ne</td></tr>
+                <tr><th scope="row">Kam chodí platby</th><td class="us">přímo na váš účet</td><td>přes platformu, výplata později</td><td>podle tarifu</td></tr>
+                <tr><th scope="row">Čekací listina, časované otevření</th><td class="us">ano</td><td>částečně</td><td>částečně</td></tr>
+                <tr><th scope="row">Data účastníků</th><td class="us">u vás, na serveru v EU</td><td>u platformy</td><td>u platformy</td></tr>
+                <tr><th scope="row">Přizpůsobení na míru</th><td class="us">ano, je to váš web</td><td>ne</td><td>ne</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="compare-note">Pokud pořádáte jednu akci ročně pro tisíc lidí, vezměte Eventbrite. Pokud učíte pravidelně desítky lidí a chcete, aby web pracoval za vás, čtěte dál.</p>
+</section>
+
+<!-- ============================================================ Reference -->
+<section class="section reference" id="reference">
+    <h2>Běží to v praxi.</h2>
+    <blockquote class="ref">
+        <p>Vzdělávací kurzy pro zubní lékaře — desítky účastníků ročně z několika zemí, platby v Kč i eurech, čekací listina, kompletní e‑mailová komunikace bez ruční práce.</p>
+        <footer>Referenci rádi sdělíme osobně.</footer>
+    </blockquote>
+</section>
+
+<!-- ============================================================ Process -->
+<section class="section process" id="spoluprace">
+    <h2>Od první schůzky ke spuštění za 4–6 týdnů.</h2>
+
+    <div class="process-grid">
+        <div class="variants">
+            <h3>Dvě varianty webu</h3>
+            <div class="variant">
+                <h4>Platba převodem s QR</h4>
+                <p>Účastník po potvrzení dostane e‑mail s platebními údaji a QR kódem. Platbu potvrdíte jedním klikem v administraci, systém pošle potvrzení a drží místo.</p>
+            </div>
+            <div class="variant">
+                <h4>Platba kartou online + převod</h4>
+                <p>Vše z první varianty a navíc platba kartou rovnou při přihlášce (Stripe). Platba se potvrdí sama, místo se rezervuje okamžitě. Bránu si účtuje Stripe, ne my.</p>
+            </div>
+            <h3>Provoz</h3>
+            <p>Hosting na vlastní doméně, HTTPS, denní zálohy, monitoring dostupnosti, aktualizace a měsíční report (návštěvnost, registrace, tržby). Jedna měsíční částka, žádné překvapení.</p>
+        </div>
+
+        <div class="needs">
+            <h3>Co od vás budeme potřebovat</h3>
+            <ol>
+                <li><b>Kurzy</b> — názvy, termíny, kapacita, ceny, anotace, informace o lektorech</li>
+                <li><b>Texty</b> — pár vět o vás, kontakty, fakturační údaje a číslo účtu pro platby</li>
+                <li><b>Fotky</b> — z kurzů nebo z praxe; co máte, zbytek dořešíme</li>
+                <li><b>Logo</b> — a název použitého fontu, ať prověříme licenci</li>
+                <li><b>Doména</b> — stávající, subdoména nebo nová; poradíme</li>
+            </ol>
+            <a class="btn btn-primary" href="#poptavka">Poptat nezávaznou nabídku</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ Add-ons -->
+<section class="section addons" id="rozsireni">
+    <h2>Rozšíření, když je budete potřebovat.</h2>
+    <div class="addons-grid">
+        <div>
+            <h3>Hotové, jen se zapne</h3>
+            <ul>
+                <li>platba kartou (Stripe)</li>
+                <li>SEPA platby v eurech pro zahraniční účastníky</li>
+                <li>externí registrace u partnera (odkaz místo formuláře)</li>
+                <li>sběr kontaktů pro marketing se souhlasem GDPR + hromadné e‑maily</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Na objednávku</h3>
+            <ul>
+                <li>automatické připomínky před kurzem (den / týden předem, bez klikání)</li>
+                <li>čekací listina s automatickou nabídkou uvolněného místa</li>
+                <li>certifikáty o absolvování (PDF automaticky e‑mailem)</li>
+                <li>slevové kódy a early‑bird ceny</li>
+                <li>anglická verze webu pro zahraniční účastníky</li>
+                <li>napojení na fakturační systém</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ FAQ -->
+<section class="section faq" id="faq">
+    <h2>Časté otázky</h2>
+    <details>
+        <summary>Komu patří web a data?</summary>
+        <p>Vám. Web běží na vaší doméně, data účastníků jsou ve vaší databázi na serveru v EU. Když skončíte, dostanete zálohu a kód.</p>
+    </details>
+    <details>
+        <summary>Můžu si sám měnit texty a přidávat kurzy?</summary>
+        <p>Ano. Kurzy, program, lektory, fotky a ceny upravujete ve vizuálním editoru v administraci. Žádné školení není potřeba — ukážeme vám to na první schůzce po spuštění.</p>
+    </details>
+    <details>
+        <summary>Co když nechci platby kartou?</summary>
+        <p>Nemusíte. Převod s QR kódem stačí většině pořadatelů. Kartu jde zapnout kdykoli později.</p>
+    </details>
+    <details>
+        <summary>Jak dlouho to trvá?</summary>
+        <p>Při dodání podkladů do dvou týdnů od schůzky obvykle spouštíme za 4–6 týdnů.</p>
+    </details>
+    <details>
+        <summary>Co se stane, když přestanu platit provoz?</summary>
+        <p>Web běží do konce zaplaceného období, pak vám předáme zálohu dat a kód. Nic vám nedržíme jako rukojmí.</p>
+    </details>
+    <details>
+        <summary>Je to GDPR v pořádku?</summary>
+        <p>Ano. Souhlasy se ukládají s datem, smazané registrace jdou do archivu s důvodem, každý e‑mail je zalogovaný. Zásady zpracování dodáme jako součást webu.</p>
+    </details>
+    <details>
+        <summary>Zvládne to nápor, když otevřu prodej?</summary>
+        <p>Kapacita se hlídá na úrovni databáze — dva lidé nikdy nedostanou stejné poslední místo. Otevření prodeje můžete načasovat a účastníci vidí odpočet.</p>
+    </details>
+</section>
+
+<!-- ============================================================ About -->
+<section class="section about" id="o-mne">
+    <h2>Kdo to staví</h2>
+    <div class="about-grid">
+        <div class="about-photo" role="img" aria-label="Fotka: Roman"></div>
+        <div>
+            <!-- TODO: doplnit jméno, počet let, rok první ostré verze -->
+            <p>Jsem Roman. Stavím weby a interní systémy pro malé firmy. Tenhle systém vznikl, protože jsem viděl, jak lektoři tráví večery přepisováním přihlášek z e‑mailu do tabulky. První verze běží v ostrém provozu od roku 2026 a každý další web z ní čerpá.</p>
+            <p>Ozvěte se, pošlu vám demo s vašimi kurzy.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ Contact -->
+<section class="section contact" id="poptavka">
+    <h2>Pošlete mi, co učíte. Vrátím vám nabídku.</h2>
+    <p class="contact-lead">Stačí dvě věty: co učíte a kolikrát ročně. Ozvu se do dvou pracovních dnů.</p>
+    <div class="contact-ways">
+        <!-- TODO: doplnit skutečné číslo (formát 420xxxxxxxxx bez plus) -->
+        <a class="way" href="https://wa.me/420000000000?text=Dobr%C3%BD%20den%2C%20m%C3%A1m%20z%C3%A1jem%20o%20web%20pro%20kurzy" target="_blank" rel="noopener">
+            <span class="way-name">WhatsApp</span>
+            <span class="way-value">Napsat zprávu</span>
+        </a>
+        <a class="way" href="mailto:info@romansolutions.cz?subject=Web%20pro%20kurzy">
+            <span class="way-name">E‑mail</span>
+            <span class="way-value">info@romansolutions.cz</span>
+        </a>
+        <a class="way" href="tel:+420000000000">
+            <span class="way-name">Telefon</span>
+            <span class="way-value">+420 000 000 000</span>
+        </a>
+    </div>
+</section>
+
+</main>
+
+<footer class="foot">
+    <div>
+        <!-- TODO: IČO, sídlo -->
+        <b>Roman Solutions</b> · IČO 00000000 · Praha
+    </div>
+    <nav aria-label="Patička">
+        <a href="https://demo.romansolutions.cz" data-demo target="_blank" rel="noopener">Demo</a>
+        <a href="zasady.html">Zásady zpracování osobních údajů</a>
+        <a href="#poptavka">Kontakt</a>
+    </nav>
+</footer>
+
+<script src="js/main.js?v=20260918"></script>
+</body>
+</html>

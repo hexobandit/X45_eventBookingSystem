@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Payment complete | {{ site_name }}{% endblock %}
+{% block meta_description %}Your payment has been received.{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">&#10003;</span>
+        <h1>Thank you, {{ registration.first_name }}</h1>
+        {% if registration.is_paid %}
+        <p>Your payment for <strong>{{ registration.event.title }}</strong> has been received and your seat is confirmed.</p>
+        {% else %}
+        <p>Your payment for <strong>{{ registration.event.title }}</strong> is being processed. You will receive a confirmation email within a few minutes.</p>
+        {% endif %}
+
+        <div class="status-detail">
+            <div class="info-item">
+                <span class="info-label">Course</span>
+                <span class="info-value">{{ registration.event.title }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date</span>
+                <span class="info-value">{{ registration.event.formatted_date }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location</span>
+                <span class="info-value">{{ registration.event.location }}</span>
+            </div>
+        </div>
+
+        <div class="status-actions">
+            <a href="{{ url_for('main.courses') }}" class="btn">More courses</a>
+            <a href="{{ url_for('main.index') }}" class="btn">Back to home</a>
+        </div>
+
+        <p class="status-note">Questions? <a href="{{ url_for('main.contact') }}">Write to us</a>.</p>
+    </div>
+</section>
+{% endblock %}

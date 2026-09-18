@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Message sent | {{ site_name }}{% endblock %}
+{% block meta_description %}Your message has been sent.{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">&#10003;</span>
+        <h1>Thank you{% if name %}, {{ name }}{% endif %}</h1>
+        <p>Your message has been sent. We will get back to you as soon as possible.</p>
+        {% if email %}
+        <p class="status-note">A copy of your message was sent to <strong>{{ email }}</strong>.</p>
+        {% endif %}
+
+        <div class="status-actions">
+            <a href="{{ url_for('main.index') }}" class="btn">Back to home</a>
+            <a href="{{ url_for('main.courses') }}" class="btn">View courses</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

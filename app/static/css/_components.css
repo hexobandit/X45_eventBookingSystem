@@ -1,0 +1,393 @@
+/* ==========================================================================
+   Components — buttons, forms, flash messages, badges
+   ========================================================================== */
+
+/* --- Buttons: ghost hairline, fill on hover ------------------------------ */
+
+.btn {
+    display: inline-block;
+    padding: 0.85rem 2.25rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    transition: color var(--transition-base),
+                background var(--transition-base),
+                border-color var(--transition-base);
+}
+
+.btn:hover {
+    color: var(--bg-body);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary {
+    color: var(--bg-body);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background: var(--accent-bright);
+    border-color: var(--accent-bright);
+    color: var(--bg-body);
+}
+
+.btn-outline {
+    /* alias kept for existing templates */
+    color: var(--accent);
+    background: transparent;
+}
+
+.btn-sm {
+    padding: 0.5rem 1.25rem;
+    font-size: var(--fs-micro);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --- Forms ---------------------------------------------------------------- */
+
+.form-group {
+    margin-bottom: var(--sp-6);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-6);
+}
+
+.form-label,
+label {
+    display: block;
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: var(--sp-2);
+}
+
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 300;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition-fast);
+}
+
+.form-control:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
+}
+
+textarea {
+    min-height: 8rem;
+    resize: vertical;
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2329ABE2' stroke-width='1'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+}
+
+.is-invalid,
+.form-control.is-invalid {
+    border-color: var(--error);
+}
+
+.form-error {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--error);
+    margin-top: var(--sp-2);
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.form-hint {
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+    margin-top: var(--sp-2);
+}
+
+/* Checkbox rows (GDPR consent) */
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+}
+
+.form-check input[type="checkbox"] {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.3rem;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+}
+
+.form-check label {
+    font-size: var(--fs-small);
+    font-weight: 300;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Honeypot — must stay visually hidden but present in DOM */
+.hp-field {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* --- Flash messages -------------------------------------------------------- */
+
+.flash-messages {
+    position: fixed;
+    top: 5.5rem;
+    right: var(--sp-4);
+    left: var(--sp-4);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    align-items: flex-end;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+}
+
+.flash {
+    pointer-events: auto;
+    max-width: 26rem;
+    padding: var(--sp-4) var(--sp-6);
+    font-size: var(--fs-small);
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    animation: flash-in 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.flash-success { border-left-color: var(--success); }
+.flash-error   { border-left-color: var(--error); }
+.flash-warning { border-left-color: var(--warning); }
+.flash-info    { border-left-color: var(--info); }
+
+@keyframes flash-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* --- Badges ----------------------------------------------------------------- */
+
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    font-size: var(--fs-micro);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-sm);
+    color: var(--accent);
+}
+
+.badge-warning { color: var(--warning); border-color: rgba(217, 188, 126, 0.4); }
+.badge-error   { color: var(--error);   border-color: rgba(217, 142, 126, 0.4); }
+
+/* --- Back link ---------------------------------------------------------------- */
+
+.back-link {
+    display: inline-block;
+    font-size: var(--fs-small);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--sp-8);
+}
+
+.back-link:hover {
+    color: var(--accent);
+}
+
+/* --- Wait overlay (form submit) --------------------------------------------- */
+
+.wait-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-8);
+    background: rgba(7, 8, 9, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+}
+
+.wait-overlay.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.wait-spinner {
+    position: relative;
+    width: 108px;
+    height: 108px;
+}
+
+.wait-spinner > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wait-ring-track {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 1.5;
+}
+
+.wait-ring-arc {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 90 231;   /* r=51 → circumference ≈ 321 */
+    filter: drop-shadow(0 0 6px rgba(41, 171, 226, 0.55));
+    transform-origin: 50% 50%;
+    animation: wait-spin 1.4s linear infinite;
+}
+
+.wait-glyph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: wait-bob 2.6s ease-in-out infinite;
+}
+
+.wait-glyph svg {
+    width: 38px;
+    height: 38px;
+    fill: none;
+    stroke: var(--text-primary);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.wait-text {
+    display: flex;
+    align-items: baseline;
+    font-size: var(--fs-small);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding-left: var(--tracking-eyebrow);
+}
+
+.wait-text .dot {
+    animation: wait-dot 1.2s infinite;
+}
+
+.wait-text .dot:nth-child(3) { animation-delay: 0.2s; }
+.wait-text .dot:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes wait-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes wait-bob {
+    0%, 100% { transform: translate(0, 2px); }
+    50%      { transform: translate(3px, -3px); }
+}
+
+@keyframes wait-dot {
+    0%, 60%, 100% { opacity: 0.25; }
+    30%           { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wait-ring-arc,
+    .wait-glyph,
+    .wait-text .dot {
+        animation: none;
+    }
+}
+
+/* --- Demo banner (DEMO_MODE only) ------------------------------------------- */
+
+.demo-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 950;
+    padding: 0.6rem var(--sp-6);
+    background: var(--accent);
+    color: #06121a;
+    font-size: var(--fs-small);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.demo-banner a {
+    color: inherit;
+    text-decoration: underline;
+    margin-left: 0.4rem;
+}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}On the waiting list | {{ site_name }}{% endblock %}
+{% block meta_description %}You have been added to the waiting list.{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">&#9432;</span>
+        <h1>Thank you, {{ registration.first_name }}</h1>
+        <p>
+            <strong>{{ registration.event.title }}</strong> is currently fully booked.
+            You have been added to the waiting list.
+        </p>
+
+        <ol class="status-steps">
+            <li>
+                <span>
+                    <strong>Check your email</strong><br>
+                    We sent a waiting-list confirmation to <strong>{{ registration.email }}</strong>.
+                </span>
+            </li>
+            <li>
+                <span>
+                    <strong>We'll contact you if a seat opens</strong><br>
+                    If a place becomes available, you'll receive an email with a registration confirmation.
+                </span>
+            </li>
+        </ol>
+
+        <div class="status-detail">
+            <div class="info-item">
+                <span class="info-label">Course</span>
+                <span class="info-value">{{ registration.event.title }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date</span>
+                <span class="info-value">{{ registration.event.formatted_date }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location</span>
+                <span class="info-value">{{ registration.event.location }}</span>
+            </div>
+        </div>
+
+        <div class="status-actions">
+            <a href="{{ url_for('main.courses') }}" class="btn">More courses</a>
+            <a href="{{ url_for('main.index') }}" class="btn">Back to home</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

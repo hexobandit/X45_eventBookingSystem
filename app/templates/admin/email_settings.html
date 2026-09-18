@@ -1,0 +1,106 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<h1>Email Settings
+    {% if settings and settings.is_configured %}
+        <span class="email-badge email-badge-ok">Configured</span>
+    {% else %}
+        <span class="email-badge email-badge-warn">Awaiting setup</span>
+    {% endif %}
+</h1>
+<p class="subtitle">SMTP configuration for sending emails</p>
+
+<form method="POST" class="settings-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>SMTP Server</h5>
+        </div>
+        <div class="dash-card-body">
+            <div class="form-row">
+                <div class="form-group form-group-wide">
+                    <label for="smtp_host">SMTP Host</label>
+                    <input type="text" id="smtp_host" name="smtp_host"
+                           class="form-control" placeholder="smtp.gmail.com"
+                           value="{{ settings.smtp_host or '' if settings else '' }}">
+                </div>
+                <div class="form-group form-group-narrow">
+                    <label for="smtp_port">Port</label>
+                    <input type="number" id="smtp_port" name="smtp_port"
+                           class="form-control" placeholder="587"
+                           value="{{ settings.smtp_port or 587 if settings else 587 }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="smtp_username">Username</label>
+                    <input type="text" id="smtp_username" name="smtp_username"
+                           class="form-control" placeholder="email@example.com"
+                           value="{{ settings.smtp_username or '' if settings else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="smtp_password">Password</label>
+                    <input type="password" id="smtp_password" name="smtp_password"
+                           class="form-control"
+                           placeholder="{{ '********' if settings and settings.smtp_password_encrypted else 'SMTP password' }}">
+                    {% if settings and settings.smtp_password_encrypted %}
+                    <small class="form-hint">Leave blank to keep the current password.</small>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="form-check-row">
+                <label class="form-check-label">
+                    <input type="checkbox" name="smtp_use_tls" value="1"
+                           {{ 'checked' if not settings or settings.smtp_use_tls }}>
+                    Use TLS (STARTTLS)
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Sender</h5>
+        </div>
+        <div class="dash-card-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sender_email">Sender email</label>
+                    <input type="email" id="sender_email" name="sender_email"
+                           class="form-control" placeholder="info@example.com"
+                           value="{{ settings.sender_email or '' if settings else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="sender_name">Sender name</label>
+                    <input type="text" id="sender_name" name="sender_name"
+                           class="form-control" placeholder="{{ site_name }}"
+                           value="{{ settings.sender_name or '' if settings else '' }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-card">
+        <div class="dash-card-header">
+            <h5>Notification Emails</h5>
+        </div>
+        <div class="dash-card-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="admin_email">Notification emails</label>
+                    <input type="text" id="admin_email" name="admin_email"
+                           class="form-control" placeholder="info@example.com"
+                           value="{{ settings.admin_email or '' if settings else '' }}">
+                    <small class="form-hint">Separate with commas. Everyone here is notified of new course bookings, book-notify signups, and contact-form messages. Also used for the test email.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-actions">
+        <button type="submit" name="action" value="save" class="btn btn-brand">Save Settings</button>
+        <button type="submit" name="action" value="test" class="btn btn-brand-outline">Send Test Email</button>
+    </div>
+</form>
+{% endblock %}

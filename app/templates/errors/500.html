@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Server error | {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="status-page">
+    <div class="status-inner">
+        <span class="status-mark" aria-hidden="true">500</span>
+        <h1>Something went wrong</h1>
+        <p>Sorry about that. Please try again, or write to us if the problem persists.</p>
+        <div class="status-actions">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to home</a>
+            <a href="{{ url_for('main.contact') }}" class="btn">Contact us</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
