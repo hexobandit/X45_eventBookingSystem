@@ -1,4 +1,5 @@
 {% extends 'admin/master.html' %}
+{% from 'admin/_course_actions.html' import course_actions %}
 
 {% block body %}
 <div class="dash-head">
@@ -163,7 +164,7 @@
                             </div>
                         </div>
                     </a>
-                    <a href="{{ url_for('admin_events.manage_view', id=event.id) }}" class="btn-brand-outline event-mini-manage">Manage</a>
+                    {{ course_actions(event) }}
                 </div>
                 {% endfor %}
             {% else %}

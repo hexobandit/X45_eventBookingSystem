@@ -20,6 +20,9 @@
         <div class="about-authors">
             {% for author in site_authors %}
             <div class="about-author reveal">
+                <figure class="author-photo">
+                    <img src="{{ url_for('static', filename='img/demo/' ~ ('klara.jpg' if loop.index == 1 else 'marek.jpg')) }}" alt="Portrait of {{ author }}" loading="lazy" width="1000" height="1000">
+                </figure>
                 <div class="author-bio">
                     <h2>{{ author }}</h2>
                     <span class="role">Photographer · Lecturer</span>

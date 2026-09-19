@@ -96,3 +96,17 @@ class TestAdminGuard:
         r = demo_client.post(f'/admin/admin_registrations/delete/', data={'id': reg.id, 'url': '/admin/admin_registrations/'})
         assert r.status_code == 302
         assert Registration.query.get(reg.id) is None
+
+
+class TestDemoCredentials:
+    def test_banner_and_login_show_configured_credentials(self, demo_app, demo_client):
+        demo_app.config['DEMO_ADMIN_EMAIL'] = 'demo@example.com'
+        demo_app.config['DEMO_ADMIN_PASSWORD'] = 'try-me-123'
+        home = demo_client.get('/').get_data(as_text=True)
+        assert 'demo@example.com / try-me-123' in home
+        login = demo_client.get('/admin/login').get_data(as_text=True)
+        assert 'demoHint' in login and '"try-me-123"' in login
+
+    def test_login_has_no_typewriter_outside_demo(self, client):
+        login = client.get('/admin/login').get_data(as_text=True)
+        assert 'demoHint' not in login

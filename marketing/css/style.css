@@ -41,6 +41,7 @@ html { scroll-behavior: smooth; }
 
 body {
     margin: 0;
+    overflow-x: hidden;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font);
@@ -529,13 +530,16 @@ main { max-width: var(--max); margin: 0 auto; }
 /* --- Responsive ------------------------------------------------------------- */
 
 @media (max-width: 900px) {
-    .hero { grid-template-columns: 1fr; }
-    .ledger { margin-top: 1rem; }
-    .problem-grid { grid-template-columns: 1fr; }
-    .steps > li { grid-template-columns: 1fr; }
-    .feature-list > div { grid-template-columns: 1fr; gap: 0.35rem; }
-    .process-grid, .addons-grid { grid-template-columns: 1fr; }
-    .contact-ways { grid-template-columns: 1fr; }
+    /* minmax(0, 1fr), not 1fr: a bare 1fr lets the nowrap ledger table push
+       the column past the viewport and the whole page scrolls sideways. */
+    .hero { grid-template-columns: minmax(0, 1fr); }
+    .ledger { margin-top: 1rem; min-width: 0; }
+    .ledger-head { flex-wrap: wrap; }
+    .problem-grid { grid-template-columns: minmax(0, 1fr); }
+    .steps > li { grid-template-columns: minmax(0, 1fr); }
+    .feature-list > div { grid-template-columns: minmax(0, 1fr); gap: 0.35rem; }
+    .process-grid, .addons-grid { grid-template-columns: minmax(0, 1fr); }
+    .contact-ways { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 600px) {

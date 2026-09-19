@@ -1,4 +1,5 @@
 {% extends "admin/master.html" %}
+{% from 'admin/_course_actions.html' import course_actions %}
 
 {% block title %}Visual Editor{% if event %} - {{ event.title }}{% endif %}{% endblock %}
 
@@ -16,7 +17,19 @@
     <div class="ve-header-right">
         <span class="ve-save-status" id="saveStatus"></span>
         <button type="button" class="ve-save-btn" id="saveBtn">Save</button>
-        <a href="{{ url_for('main.course_detail', slug=event.slug) if event else '#' }}" target="_blank" class="ve-view-btn" id="viewSiteBtn" {% if not event %}style="display:none"{% endif %}>View on website</a>
+        {% if event %}
+        {{ course_actions(event, current='edit', labels=True, website=True) }}
+        {% else %}
+        {# New course: hidden until the first save; visual-edit.js fills __ID__ / slug. #}
+        <div class="ra-group" id="courseActions" hidden
+             data-url-registrations="{{ url_for('admin_events.details_view', id='__ID__') }}"
+             data-url-payments="{{ url_for('admin_events.manage_view', id='__ID__') }}">
+            <a class="ra-btn ra-btn-label" href="#" data-role="registrations"><span class="ra-icon ra-people"></span><span>Registrations</span></a>
+            <a class="ra-btn ra-btn-label ra-current" href="#" aria-current="page"><span class="ra-icon ra-pencil"></span><span>Edit page</span></a>
+            <a class="ra-btn ra-btn-label" href="#" data-role="payments"><span class="ra-icon ra-money"></span><span>Payments &amp; emails</span></a>
+            <a class="ra-btn ra-btn-label" href="#" target="_blank" rel="noopener" data-role="website"><span class="ra-icon ra-external"></span><span>View on website</span></a>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -237,10 +250,10 @@ Course facts (I fill these in):
                 <div>
                     <strong>Payment details are managed separately.</strong>
                     Bank account, IBAN / SEPA, variable symbol, QR codes and the Stripe card option are set in the course's
-                    <strong>Manage</strong> panel (Courses &rarr; course &rarr; Manage course &rarr; Payment details), not here.
+                    <strong>Payments &amp; emails</strong> page (the money icon next to the course), not here.
                     The price above is only what visitors see on the course page.
                     {% if event %}<a href="{{ url_for('admin_events.manage_view', id=event.id) }}">Open payment details &rarr;</a>
-                    {% else %}Save the course first, then open its Manage panel.{% endif %}
+                    {% else %}Save the course first, then open its Payments &amp; emails page.{% endif %}
                 </div>
             </div>
             <div class="ve-toggles">

@@ -155,3 +155,67 @@ window.addEventListener('scroll', () => {
         });
     });
 })();
+
+/* ==========================================================================
+   Hero: the cursor is the key light
+   Writes --lx / --ly (0..1) on the hero as the pointer moves; the CSS does
+   the lighting. Modifier chips set data-mod. Touch devices get the CSS
+   orbit animation instead; reduced motion keeps the default lamp.
+   ========================================================================== */
+
+(function () {
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canHover = window.matchMedia('(hover: hover)').matches;
+
+    const clamp = (v) => Math.min(1, Math.max(0, v));
+    const setLamp = (x, y) => {
+        hero.style.setProperty('--lx', clamp(x).toFixed(3));
+        hero.style.setProperty('--ly', clamp(y).toFixed(3));
+    };
+
+    if (reduce) {
+        // static lamp, nothing moves
+    } else if (canHover) {
+        let x = 0, y = 0, raf = null;
+        hero.addEventListener('pointermove', (e) => {
+            const r = hero.getBoundingClientRect();
+            x = (e.clientX - r.left) / r.width;
+            y = (e.clientY - r.top) / r.height;
+            if (raf) return;
+            raf = requestAnimationFrame(() => { setLamp(x, y); raf = null; });
+        });
+    } else {
+        // Touch: scrolling moves the lamp down and across the stage, a slow
+        // drift keeps it alive while the page is still. A finger on the hero
+        // overrides both for a moment.
+        let touchUntil = 0;
+        hero.addEventListener('pointermove', (e) => {
+            if (e.pointerType !== 'touch') return;
+            const r = hero.getBoundingClientRect();
+            setLamp((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+            touchUntil = performance.now() + 1500;
+        }, { passive: true });
+
+        const tick = (now) => {
+            if (now > touchUntil) {
+                const h = hero.offsetHeight || 1;
+                const progress = clamp(window.scrollY / h);            // 0 at top, 1 when hero scrolled away
+                const drift = Math.sin(now / 2600) * 0.12;
+                setLamp(0.25 + progress * 0.55 + drift, 0.18 + progress * 0.6);
+            }
+            if (window.scrollY < hero.offsetHeight * 1.2) requestAnimationFrame(tick);
+            else setTimeout(() => requestAnimationFrame(tick), 400);   // idle cheaply once out of view
+        };
+        requestAnimationFrame(tick);
+    }
+
+    hero.querySelectorAll('.mod').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            hero.dataset.mod = btn.dataset.mod;
+            hero.querySelectorAll('.mod').forEach((b) => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+        });
+    });
+})();

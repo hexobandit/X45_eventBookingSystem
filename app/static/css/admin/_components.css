@@ -111,6 +111,161 @@
     border-color: var(--admin-accent);
 }
 
+/* ---- Course action icons (list rows, dashboard, course pages) ----
+   Own line icons as SVG masks painted with currentColor.
+   Vocabulary, used everywhere the same way:
+     people  = Registrations      (who signed up)
+     pencil  = Edit page          (what the website shows)
+     money   = Payments & emails  (bank details, QR, mails, waitlist)
+     trash   = Delete
+   Tooltip: [data-tip] is shown by the small script in master.html. */
+.ra-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.ra-group[hidden] { display: none; }
+.ra-btn {
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    border: 1px solid var(--admin-border-medium);
+    border-radius: 17px;
+    background: var(--admin-bg-card);
+    color: var(--admin-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    cursor: pointer;
+    line-height: 1;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--admin-shadow-sm);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+.ra-btn-label {
+    padding: 0 14px 0 10px;
+    white-space: nowrap;
+}
+.ra-btn:hover,
+.ra-btn:focus-visible {
+    background: var(--accent-blue-bg);
+    border-color: var(--admin-accent);
+    color: var(--admin-accent);
+    text-decoration: none;
+    transform: translateY(-1px);
+    outline: none;
+}
+.ra-btn.ra-danger:hover,
+.ra-btn.ra-danger:focus-visible {
+    background: var(--status-cancelled-bg);
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+.ra-btn.ra-current {
+    background: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: #fff;
+    pointer-events: none;
+}
+.ra-icon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    background-color: currentColor;
+    -webkit-mask: var(--ra-svg) center / contain no-repeat;
+    mask: var(--ra-svg) center / contain no-repeat;
+}
+.ra-icon::before { content: none; }
+.ra-eye {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+.ra-people {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.3'/%3E%3Cpath d='M2.5 20c0-3.7 2.9-6.2 6.5-6.2s6.5 2.5 6.5 6.2'/%3E%3Cpath d='M15.5 5a3.3 3.3 0 0 1 0 6'/%3E%3Cpath d='M17.5 14.2c2.4.6 4 2.6 4 5.8'/%3E%3C/svg%3E");
+}
+.ra-pencil {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5 4 20z'/%3E%3Cpath d='M13.5 7l3.5 3.5'/%3E%3C/svg%3E");
+}
+.ra-money {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 3.5h6l-1.6 3h-2.8z'/%3E%3Cpath d='M10.6 6.5C6.6 8.3 4 11.6 4 15c0 3.6 3.4 5.5 8 5.5s8-1.9 8-5.5c0-3.4-2.6-6.7-6.6-8.5'/%3E%3Cpath d='M12 10.2v7.4'/%3E%3Cpath d='M13.9 12.1c-.3-.7-1-1.1-1.9-1.1-1.1 0-1.9.6-1.9 1.4 0 1.9 3.8 1 3.8 2.9 0 .8-.8 1.4-1.9 1.4-.9 0-1.6-.4-1.9-1.1'/%3E%3C/svg%3E");
+}
+.ra-trash {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9.5 7V4.5h5V7'/%3E%3Cpath d='M6 7l.9 12a2 2 0 0 0 2 1.9h6.2a2 2 0 0 0 2-1.9L18 7'/%3E%3Cpath d='M10 11v6M14 11v6'/%3E%3C/svg%3E");
+}
+.ra-external {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6'/%3E%3Cpath d='M20 4l-9 9'/%3E%3Cpath d='M18 13.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5.5'/%3E%3C/svg%3E");
+}
+.ra-print {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 8V3.5h10V8'/%3E%3Cpath d='M7 16H4.5a1 1 0 0 1-1-1V10a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1H17'/%3E%3Cpath d='M7 13.5h10v7H7z'/%3E%3C/svg%3E");
+}
+.ra-check {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+}
+.ra-minus {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12h12'/%3E%3C/svg%3E");
+}
+/* ---- Busy state for any button while the server works ----
+   Added by window.setLoading() (master.html): on form submit, and on the
+   confirm-modal OK button until the page navigates / the request resolves. */
+.is-loading {
+    position: relative;
+    pointer-events: none;
+    cursor: progress;
+    opacity: 0.85;
+}
+.is-loading::before {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    vertical-align: -2px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: ra-spin 0.7s linear infinite;
+}
+.ra-btn.is-loading::before { margin-right: 0; }
+.ra-btn.is-loading .ra-icon { display: none; }
+.ra-btn-label.is-loading::before { margin-right: 7px; }
+.manage-modal.is-busy .manage-modal-close,
+.manage-modal.is-busy .btn-secondary {
+    opacity: 0.4;
+    pointer-events: none;
+}
+@keyframes ra-spin { to { transform: rotate(360deg); } }
+
+/* Tooltip bubble (appended to body by master.html) */
+.ra-tip {
+    position: fixed;
+    z-index: 2000;
+    transform: translate(-50%, calc(-100% - 6px));
+    background: var(--admin-primary);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 5px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+.ra-tip.show { opacity: 1; }
+.ra-tip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin-left: -4px;
+    border: 4px solid transparent;
+    border-top-color: var(--admin-primary);
+}
+
 /* ---- Empty State ---- */
 .empty-state {
     padding: 40px 24px;

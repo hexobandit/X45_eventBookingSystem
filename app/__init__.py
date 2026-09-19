@@ -53,6 +53,8 @@ def create_app(config_name=None):
             'canonical_domain': app.config.get('CANONICAL_DOMAIN', ''),
             'ga4_id': app.config.get('GA4_ID', ''),
             'demo_mode': app.config.get('DEMO_MODE', False),
+            'demo_admin_email': app.config.get('DEMO_ADMIN_EMAIL', ''),
+            'demo_admin_password': app.config.get('DEMO_ADMIN_PASSWORD', ''),
             'asset_v': asset_version,
         }
         context.update(branding.brand_context())

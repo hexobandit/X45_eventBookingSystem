@@ -182,6 +182,8 @@ def seed_events_command(reset):
             'event_type': 'workshop',
             'event_category': 'client',
             'lecturers': '[{"name": "Klára Nováková", "role": "Lighting & portrait"}, {"name": "Marek Holub", "role": "Workflow & colour"}]',
+            'image_url': '/static/img/demo/course-masterclass.jpg',
+            'image_position_y': 30,
             'program': '''<ul>
 <li>Day 1 morning: reading light — direction, size, distance, fall-off</li>
 <li>Day 1 afternoon: one-light portraits, modifiers side by side</li>
@@ -216,6 +218,8 @@ def seed_events_command(reset):
             'event_type': 'workshop',
             'event_category': 'client',
             'lecturers': '[{"name": "Klára Nováková", "role": "Lighting & portrait"}]',
+            'image_url': '/static/img/demo/course-weekend.jpg',
+            'image_position_y': 35,
             'program': '''<ul>
 <li>Saturday: window light indoors, reflectors and flags</li>
 <li>Sunday: open shade, backlight, the golden hour</li>
@@ -238,6 +242,8 @@ def seed_events_command(reset):
             'event_type': 'seminar',
             'event_category': 'client',
             'lecturers': '[{"name": "Marek Holub", "role": "Workflow & colour"}]',
+            'image_url': '/static/img/demo/course-webinar.jpg',
+            'image_position_y': 30,
             'is_featured': False,
         },
     ]
@@ -252,20 +258,28 @@ def seed_events_command(reset):
     # Sample registrations on the masterclass: 5 of 6 seats taken, one on the waitlist.
     masterclass = created[0]
     people = [
-        ('Jana', 'Dvořáková', 'jana.dvorakova@example.com', RegistrationStatus.CONFIRMED, PaymentStatus.PAID, PaymentMethod.CARD),
-        ('Tomáš', 'Král', 'tomas.kral@example.com', RegistrationStatus.CONFIRMED, PaymentStatus.PAID, PaymentMethod.BANK_TRANSFER),
-        ('Petra', 'Svobodová', 'petra.svobodova@example.com', RegistrationStatus.CONFIRMED, PaymentStatus.UNPAID, PaymentMethod.BANK_TRANSFER),
-        ('Lukáš', 'Procházka', 'lukas.prochazka@example.com', RegistrationStatus.CONFIRMED, PaymentStatus.UNPAID, PaymentMethod.BANK_TRANSFER),
-        ('Eva', 'Marková', 'eva.markova@example.com', RegistrationStatus.PENDING, PaymentStatus.UNPAID, None),
-        ('Martin', 'Beneš', 'martin.benes@example.com', RegistrationStatus.WAITLIST, PaymentStatus.UNPAID, None),
+        ('Jana', 'Dvořáková', 'jana.dvorakova@example.com', '+420 604 112 233', 'Atelier Dvořák',
+         RegistrationStatus.CONFIRMED, PaymentStatus.PAID, PaymentMethod.CARD),
+        ('Tomáš', 'Král', 'tomas.kral@example.com', '+420 777 908 114', 'Král Studio s.r.o.',
+         RegistrationStatus.CONFIRMED, PaymentStatus.PAID, PaymentMethod.BANK_TRANSFER),
+        ('Petra', 'Svobodová', 'petra.svobodova@example.com', '+420 725 441 097', None,
+         RegistrationStatus.CONFIRMED, PaymentStatus.UNPAID, PaymentMethod.BANK_TRANSFER),
+        ('Lukáš', 'Procházka', 'lukas.prochazka@example.com', '+420 603 220 854', 'Freelance',
+         RegistrationStatus.CONFIRMED, PaymentStatus.UNPAID, PaymentMethod.BANK_TRANSFER),
+        ('Eva', 'Marková', 'eva.markova@example.com', '+420 608 771 340', 'Marková Photo',
+         RegistrationStatus.PENDING, PaymentStatus.UNPAID, None),
+        ('Martin', 'Beneš', 'martin.benes@example.com', '+420 731 556 902', None,
+         RegistrationStatus.WAITLIST, PaymentStatus.UNPAID, None),
     ]
     seat_count = 0
-    for i, (first, last, email, status, pay_status, method) in enumerate(people):
+    for i, (first, last, email, phone, org, status, pay_status, method) in enumerate(people):
         reg = Registration(
             event_id=masterclass.id,
             first_name=first,
             last_name=last,
             email=email,
+            phone=phone,
+            organization=org,
             gdpr_consent=True,
             gdpr_consent_date=now - timedelta(days=10 - i),
             confirmation_token=Registration.generate_token(),

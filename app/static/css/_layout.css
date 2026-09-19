@@ -31,14 +31,15 @@
     left: 0;
     right: 0;
     z-index: 900;
-    background: rgba(7, 8, 9, 0.82);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: transparent;
     border-bottom: 1px solid transparent;
-    transition: border-color var(--transition-base);
+    transition: border-color var(--transition-base), background var(--transition-base);
 }
 
 .header.is-scrolled {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom-color: var(--border-color);
 }
 
@@ -52,20 +53,17 @@
     justify-content: space-between;
 }
 
-/* Wordmark — ultra-light, wide tracking, copper */
+/* Wordmark — bold, tight, black */
 .logo {
     font-family: var(--font-display);
-    font-weight: 200;
-    font-size: 1.1rem;
+    font-weight: 700;
+    font-size: 1.25rem;
     letter-spacing: var(--tracking-wordmark);
-    text-transform: uppercase;
-    color: var(--accent);
-    /* optical correction for the wide tracking on the last letter */
-    margin-right: calc(-1 * var(--tracking-wordmark));
+    color: var(--text-primary);
 }
 
 .logo:hover {
-    color: var(--accent-bright);
+    color: var(--accent);
 }
 
 .nav {
@@ -75,20 +73,19 @@
 }
 
 .nav a {
-    font-size: var(--fs-micro);
-    font-weight: 400;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+    font-family: var(--font-display);
+    font-size: var(--fs-small);
+    font-weight: 500;
     color: var(--text-secondary);
-    padding: var(--sp-2) 0;
-    border-bottom: 1px solid transparent;
-    transition: color var(--transition-fast), border-color var(--transition-fast);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--radius-pill);
+    transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .nav a:hover,
 .nav a.is-active {
     color: var(--text-primary);
-    border-bottom-color: var(--accent);
+    background: var(--bg-card);
 }
 
 /* Mobile menu trigger */
@@ -110,7 +107,7 @@
 .overlay-bg {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(23, 23, 28, 0.35);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--transition-base);
@@ -150,13 +147,11 @@
 
 .menu-overlay nav a {
     font-family: var(--font-display);
-    font-weight: 200;
-    font-size: 1.3rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 1.5rem;
     color: var(--text-primary);
     padding-left: var(--sp-4);
-    border-left: 1px solid var(--border-accent);
+    border-left: 3px solid var(--light);
 }
 
 .menu-overlay nav a:hover {
@@ -200,11 +195,10 @@
 
 .footer-brand {
     font-family: var(--font-display);
-    font-weight: 200;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 1.25rem;
     letter-spacing: var(--tracking-wordmark);
-    text-transform: uppercase;
-    color: var(--accent);
+    color: var(--text-primary);
     margin-bottom: var(--sp-4);
 }
 
@@ -215,12 +209,10 @@
 }
 
 .footer h4 {
-    font-family: var(--font-body);
-    font-size: var(--fs-micro);
-    font-weight: 500;
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-primary);
     margin-bottom: var(--sp-4);
 }
 
@@ -251,7 +243,6 @@
     flex-wrap: wrap;
     gap: var(--sp-2);
     font-size: var(--fs-micro);
-    letter-spacing: 0.08em;
     color: var(--text-muted);
 }
 

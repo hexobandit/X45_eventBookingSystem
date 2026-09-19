@@ -12,7 +12,6 @@ from flask_admin import Admin, AdminIndexView, BaseView, expose
 from flask_admin.actions import action
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import FileUploadField, rules
-from flask_admin.model.template import BaseListRowAction
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 from sqlalchemy.orm.attributes import get_history
@@ -195,7 +194,7 @@ class EventModelView(SecureAdminMixin, ModelView):
     # not shown or editable anywhere for now (homepage just lists upcoming events)
     column_list = [
         'title', 'event_date', 'location', 'capacity',
-        'registrations_link', 'manage_link', 'external_badge',
+        'registrations_link', 'external_badge',
         'is_active', 'is_test'  # 'is_featured'
     ]
     column_searchable_list = ['title', 'location', 'description']
@@ -232,7 +231,6 @@ class EventModelView(SecureAdminMixin, ModelView):
         'registration_open': 'Registration open',
         'registration_opens_at': 'Registration opens at',
         'registrations_link': 'Registrations',
-        'manage_link': 'Manage',
         'external_badge': 'External',
         'created_at': 'Created',
         'updated_at': 'Updated'
@@ -309,16 +307,20 @@ class EventModelView(SecureAdminMixin, ModelView):
     # Formatters
     @staticmethod
     def _flag_toggle(model, field):
-        """Clickable on/off icon for the list view; JS confirms + saves via AJAX."""
+        """Clickable on/off icon button for the list view (same .ra-btn design
+        as the row actions); JS in list_with_heading.html confirms + saves via AJAX."""
         val = bool(getattr(model, field))
-        icon = ('fa fa-check-circle glyphicon glyphicon-ok-circle icon-ok-circle' if val
-                else 'fa fa-minus-circle glyphicon glyphicon-minus-sign icon-minus-sign')
+        if field == 'is_active':
+            tip = 'Visible on website \u2014 click to hide' if val else 'Hidden \u2014 click to publish'
+        else:
+            tip = 'Featured \u2014 click to remove' if val else 'Not featured \u2014 click to feature'
+        icon = 'ra-icon ra-check' if val else 'ra-icon ra-minus'
         return Markup(
-            f'<button type="button" class="flag-toggle" data-id="{model.id}" '
-            f'data-field="{field}" data-value="{1 if val else 0}" '
+            f'<button type="button" class="ra-btn flag-toggle{" is-on" if val else ""}" '
+            f'data-id="{model.id}" data-field="{field}" data-value="{1 if val else 0}" '
             f'data-title="{escape(model.title)}" '
             f'data-url="{url_for("admin_events.toggle_flag")}" '
-            f'title="Click to change"><span class="{icon}"></span></button>'
+            f'data-tip="{tip}" aria-label="{tip}"><span class="{icon}"></span></button>'
         )
 
     @staticmethod
@@ -352,10 +354,6 @@ class EventModelView(SecureAdminMixin, ModelView):
     column_formatters = {
         'event_date': lambda v, c, m, p: EventModelView._date_cell(m),
         'registrations_link': lambda v, c, m, p: EventModelView._capacity_cell(m),
-        'manage_link': lambda v, c, m, p: Markup(
-            f'<a href="/admin/admin_events/manage/?id={m.id}" '
-            f'class="btn-brand-outline btn-list-manage">Manage</a>'
-        ),
         'price': lambda v, c, m, p: m.formatted_price if m.price else 'On request',
         'is_active': lambda v, c, m, p: EventModelView._flag_toggle(m, 'is_active'),
         # 'is_featured': lambda v, c, m, p: EventModelView._flag_toggle(m, 'is_featured'),  # future feature
@@ -387,6 +385,20 @@ class EventModelView(SecureAdminMixin, ModelView):
         db.session.commit()
         return jsonify(success=True, value=new_value)
 
+    def get_list_row_actions(self):
+        """Row icons, same vocabulary as the dashboard / course pages:
+        people = Registrations, pencil = Edit page, money = Payments & emails,
+        trash = Delete. Macros live in templates/admin/model/row_actions.html."""
+        from flask_admin.model.template import (
+            TemplateLinkRowAction, EditRowAction, DeleteRowAction)
+        actions = [TemplateLinkRowAction('row_actions.registrations_row', 'Registrations')]
+        if self.can_edit:
+            actions.append(EditRowAction())
+        actions.append(TemplateLinkRowAction('row_actions.payments_row', 'Payments & emails'))
+        if self.can_delete:
+            actions.append(DeleteRowAction())
+        return actions + (self.column_extra_row_actions or [])
+
     @expose('/edit/', methods=['GET', 'POST'])
     def edit_view(self):
         """Redirect edit to visual editor."""
@@ -414,6 +426,32 @@ class EventModelView(SecureAdminMixin, ModelView):
             event=event,
             registrations=registrations,
             return_url=url_for('.index_view')
+        )
+
+    @expose('/attendee-sheet/')
+    def attendee_sheet(self):
+        """Printable welcome-desk sheet: event header + expected attendees
+        (confirmed + pending), waiting list separately, cancelled left out.
+        Standalone page (no admin chrome) so Print / Save as PDF / PNG are clean."""
+        event_id = request.args.get('id')
+        if not event_id:
+            return redirect(url_for('.index_view'))
+        event = Event.query.get_or_404(int(event_id))
+
+        regs = Registration.query.filter_by(event_id=event.id)\
+            .order_by(Registration.last_name.asc(), Registration.first_name.asc()).all()
+        expected = [r for r in regs if r.status in (RegistrationStatus.CONFIRMED, RegistrationStatus.PENDING)]
+        waitlist = [r for r in regs if r.status == RegistrationStatus.WAITLIST]
+        paid = sum(1 for r in expected if r.payment_status == PaymentStatus.PAID)
+
+        return self.render(
+            'admin/event_attendee_sheet.html',
+            event=event,
+            expected=expected,
+            waitlist=waitlist,
+            paid_count=paid,
+            generated_at=datetime.now(),
+            return_url=url_for('.details_view', id=event.id),
         )
 
     @expose('/email-preview/')
@@ -552,11 +590,16 @@ class EventModelView(SecureAdminMixin, ModelView):
                                  f'Domestic: {event.payment_bank_account or "—"} ({event.domestic_amount or "—"} CZK), '
                                  f'SEPA: {event.payment_sepa_iban or "—"} ({event.sepa_amount or "—"} EUR), '
                                  f'VS: {event.payment_variable_symbol or "—"}')
-                if not event.has_payment_details:
-                    flash('Payment details saved, but no method is complete yet: domestic needs an '
-                          'account number and a CZK amount, SEPA needs an IBAN and a EUR amount.', 'warning')
+                # Both offline methods are independent: a course may offer one, both or neither.
+                ready = ([ 'Domestic' ] if event.has_domestic_payment else []) + \
+                        ([ 'SEPA' ] if event.has_sepa_payment else [])
+                if ready:
+                    noun = 'transfers set' if len(ready) > 1 else 'transfer set'
+                    flash(f'Payment details saved. {" and ".join(ready)} {noun}.', 'success')
                 else:
-                    flash('Payment details saved.', 'success')
+                    flash('Payment details saved, but no bank transfer is complete yet: a domestic transfer '
+                          'needs an account number and a CZK amount, a SEPA transfer a valid IBAN and a EUR '
+                          'amount. Participants will not get bank details yet.', 'warning')
 
             elif action == 'send_confirmation_email':
                 from app.services.email import email_service
@@ -1263,19 +1306,6 @@ class EventModelView(SecureAdminMixin, ModelView):
         return super().delete_model(model)
 
 
-class EditTextRowAction(BaseListRowAction):
-    """Row action that renders an 'Edit' text link instead of a pencil icon."""
-
-    def __init__(self):
-        super().__init__(title='Edit registration')
-
-    def render(self, context, row_id, row):
-        get_url = context['get_url']
-        return_url = context['return_url']
-        url = get_url('.edit_view', id=row_id, url=return_url)
-        return Markup(f'<a href="{url}" title="{self.title}">Edit</a>')
-
-
 class RegistrationModelView(SecureAdminMixin, ModelView):
     """Admin view for Registrations."""
 
@@ -1513,12 +1543,12 @@ class RegistrationModelView(SecureAdminMixin, ModelView):
         'created_at': lambda v, c, m, p: RegistrationModelView._registered_cell(m),
     }
 
-    # List row actions — replace pencil icon with "Edit" text link
+    # Row icons, same vocabulary as everywhere else: pencil = edit, trash = delete
     def get_list_row_actions(self):
-        from flask_admin.model.template import DeleteRowAction
+        from flask_admin.model.template import TemplateLinkRowAction, DeleteRowAction
         actions = []
         if self.can_edit:
-            actions.append(EditTextRowAction())
+            actions.append(TemplateLinkRowAction('row_actions.edit_row', 'Edit registration'))
         if self.can_delete:
             actions.append(DeleteRowAction())
         return actions

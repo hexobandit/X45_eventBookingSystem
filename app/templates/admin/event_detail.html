@@ -1,15 +1,12 @@
 {% extends 'admin/master.html' %}
+{% from 'admin/_course_actions.html' import course_actions %}
 
 {% block body %}
 <div class="event-detail-header">
     <a href="{{ return_url }}" class="back-link">&larr; Back to courses</a>
     <div class="event-detail-title">
         <h1>{{ event.title }}</h1>
-        <div class="event-detail-actions">
-            <a href="{{ url_for('admin_events.manage_view', id=event.id) }}" class="btn btn-primary btn-sm">Manage course</a>
-            <a href="{{ url_for('admin_events.visual_edit_view', id=event.id) }}" class="btn btn-primary btn-sm">Edit</a>
-            <a href="{{ url_for('main.course_detail', slug=event.slug) }}" class="btn btn-secondary btn-sm" target="_blank">View on website &nearr;</a>
-        </div>
+        {{ course_actions(event, current='registrations', labels=True, website=True) }}
     </div>
 </div>
 
@@ -66,6 +63,8 @@
 <div class="dash-card">
     <div class="dash-card-header">
         <h5>Registrations ({{ registrations|length }})</h5>
+        <a class="ra-btn ra-btn-label" href="{{ url_for('admin_events.attendee_sheet', id=event.id) }}"
+           data-tip="Printable list for the welcome desk (print, PDF, PNG)"><span class="ra-icon ra-print"></span><span>Attendee list</span></a>
     </div>
     <div class="dash-card-body">
         {% if registrations %}
@@ -128,7 +127,8 @@
                     </td>
                     <td>{{ reg.created_at.strftime('%d.%m.%Y') }}</td>
                     <td class="list-buttons-column">
-                        <a href="{{ url_for('admin_registrations.edit_view', id=reg.id) }}">Edit</a>
+                        <a class="ra-btn" href="{{ url_for('admin_registrations.edit_view', id=reg.id) }}"
+                           data-tip="Edit registration" aria-label="Edit registration"><span class="ra-icon ra-pencil"></span></a>
                     </td>
                 </tr>
                 {% endfor %}

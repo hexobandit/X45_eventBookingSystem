@@ -1,0 +1,27 @@
+{# Course action buttons — one vocabulary everywhere:
+     people = Registrations, pencil = Edit page, money = Payments & emails.
+   current: which one the visitor is on (rendered as the dark "you are here"
+   pill). labels: icon + text (page headers) vs icon only (lists, dashboard).
+   website: append "View on website" link. #}
+{% macro course_actions(event, current=None, labels=False, website=False) %}
+{%- set items = [
+    ('registrations', url_for('admin_events.details_view', id=event.id), 'ra-people', 'Registrations'),
+    ('edit',          url_for('admin_events.visual_edit_view', id=event.id), 'ra-pencil', 'Edit page'),
+    ('payments',      url_for('admin_events.manage_view', id=event.id), 'ra-money', 'Payments & emails'),
+] -%}
+<div class="ra-group">
+  {%- for key, href, icon, label in items %}
+  <a class="ra-btn{% if labels %} ra-btn-label{% endif %}{% if key == current %} ra-current{% endif %}"
+     href="{{ href }}"{% if not labels %} data-tip="{{ label }}"{% endif %} aria-label="{{ label }}"
+     {%- if key == current %} aria-current="page"{% endif %}>
+    <span class="ra-icon {{ icon }}"></span>{% if labels %}<span>{{ label }}</span>{% endif %}
+  </a>
+  {%- endfor %}
+  {%- if website and event.slug %}
+  <a class="ra-btn{% if labels %} ra-btn-label{% endif %}" href="{{ url_for('main.course_detail', slug=event.slug) }}"
+     target="_blank" rel="noopener"{% if not labels %} data-tip="View on website"{% endif %} aria-label="View on website">
+    <span class="ra-icon ra-external"></span>{% if labels %}<span>View on website</span>{% endif %}
+  </a>
+  {%- endif %}
+</div>
+{%- endmacro %}

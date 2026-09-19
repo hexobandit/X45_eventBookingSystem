@@ -17,31 +17,33 @@
     {{ super() }}
     {# Active/Featured toggles in the course list (.flag-toggle buttons) #}
     <style>
-    .flag-toggle {
-        -webkit-appearance: none;
-        appearance: none;
-        background: transparent;
-        border: 0;
-        box-shadow: none;
-        margin: 0;
-        padding: 3px 5px;
-        font-size: 1rem;
-        line-height: 1;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: background 0.15s ease, transform 0.1s ease;
+    .flag-toggle.is-on {
+        color: var(--accent-green);
+        background: var(--accent-green-bg);
+        border-color: rgba(5, 150, 105, 0.35);
     }
-    .flag-toggle:hover {
-        background: rgba(0, 0, 0, 0.07);
-        transform: scale(1.12);
+    .flag-toggle:not(.is-on) { color: var(--admin-text-muted); }
+    .flag-toggle.is-on:hover,
+    .flag-toggle.is-on:focus-visible {
+        color: var(--accent-red);
+        background: var(--status-cancelled-bg);
+        border-color: var(--accent-red);
     }
-    .flag-toggle:focus { outline: none; }
-    .flag-toggle:focus-visible { outline: 2px solid #29ABE2; outline-offset: 1px; }
+    .flag-toggle:not(.is-on):hover,
+    .flag-toggle:not(.is-on):focus-visible {
+        color: var(--accent-green);
+        background: var(--accent-green-bg);
+        border-color: var(--accent-green);
+    }
     </style>
     <script>
     (function () {
-        var ICON_ON = 'fa fa-check-circle glyphicon glyphicon-ok-circle icon-ok-circle';
-        var ICON_OFF = 'fa fa-minus-circle glyphicon glyphicon-minus-sign icon-minus-sign';
+        var ICON_ON = 'ra-icon ra-check';
+        var ICON_OFF = 'ra-icon ra-minus';
+        var TIPS = {
+            is_active: ['Hidden \u2014 click to publish', 'Visible on website \u2014 click to hide'],
+            is_featured: ['Not featured \u2014 click to feature', 'Featured \u2014 click to remove']
+        };
 
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('.flag-toggle');
@@ -60,7 +62,7 @@
                     : 'Feature "' + title + '"? It will be highlighted on the homepage.';
             }
             window.showConfirm(msg, function () {
-                fetch(btn.getAttribute('data-url'), {
+                return fetch(btn.getAttribute('data-url'), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -73,6 +75,10 @@
                         if (d.success) {
                             btn.setAttribute('data-value', d.value ? '1' : '0');
                             btn.querySelector('span').className = d.value ? ICON_ON : ICON_OFF;
+                            btn.classList.toggle('is-on', !!d.value);
+                            var tips = TIPS[field] || TIPS.is_active;
+                            btn.setAttribute('data-tip', tips[d.value ? 1 : 0]);
+                            btn.setAttribute('aria-label', tips[d.value ? 1 : 0]);
                         } else {
                             window.showConfirm('Save failed: ' + (d.error || 'unknown error'), function () {});
                         }

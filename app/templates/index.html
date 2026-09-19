@@ -3,24 +3,31 @@
 {% block title %}{{ site_name }} — {{ site_title_suffix }}{% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<section class="hero">
+<!-- Hero — the cursor is your key light (see _pages.css) -->
+<section class="hero" id="hero" data-mod="softbox">
+    <span class="lamp" aria-hidden="true"></span>
     <div class="hero-content">
-        <span class="hero-eyebrow" data-stagger="1">{{ site_title_suffix }}</span>
-        <h1 class="hero-title" data-stagger="2">{{ site_name }}</h1>
-        <div class="hero-manifesto" data-stagger="3" aria-label="{{ site_tagline }}">
-            {% set phrases = site_tagline.rstrip('.').split('. ') %}
-            {% for phrase in phrases %}
-            <span>{{ phrase }}</span>
-            {% if not loop.last %}<span class="bar" aria-hidden="true"></span>{% endif %}
-            {% endfor %}
+        <p class="hero-kicker">{{ site_title_suffix }} · {{ site_city }}</p>
+        <h1 class="hero-title">Learn to see light.</h1>
+        <p class="hero-lead">Small groups, real equipment, honest feedback. Play with the lamp — that is lesson one.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('main.courses') }}" class="btn btn-primary">See upcoming courses</a>
+            <a href="{{ url_for('main.about') }}" class="btn">Who teaches</a>
         </div>
-        <div class="hero-actions" data-stagger="4">
-            <a href="{{ url_for('main.courses') }}" class="btn btn-primary">View courses</a>
-            <a href="{{ url_for('main.about') }}" class="btn">About us</a>
+        <div class="light-modifiers" role="group" aria-label="Light modifier">
+            <span class="mod-label">On the lamp:</span>
+            <button type="button" class="mod" data-mod="bulb" aria-pressed="false">Bare bulb</button>
+            <button type="button" class="mod" data-mod="softbox" aria-pressed="true">Softbox</button>
+            <button type="button" class="mod" data-mod="window" aria-pressed="false">Window</button>
         </div>
     </div>
-    <span class="hero-scroll" aria-hidden="true"></span>
+    <div class="hero-stage">
+        <div class="subject-shadow" aria-hidden="true"></div>
+        <div class="subject">
+            <img src="{{ url_for('static', filename='img/demo/hero-model.jpg') }}" alt="Portrait from a studio session" width="1000" height="1000" fetchpriority="high">
+        </div>
+        <div class="stage-floor" aria-hidden="true"></div>
+    </div>
 </section>
 
 <!-- Intro -->
@@ -31,6 +38,14 @@
         <p>At <strong>{{ site_name }}</strong> we keep groups small, put the equipment in your hands from the first hour, and build every session around the situations you actually meet on a job.</p>
         <p>Theory in the morning, practice for the rest of the day, and honest feedback throughout.</p>
         <hr class="rule rule--center">
+    </div>
+    <div class="container">
+        <div class="studio-strip reveal">
+            <figure><img src="{{ url_for('static', filename='img/demo/studio-1.jpg') }}" alt="" loading="lazy" width="1000" height="1000"><figcaption>Portrait session, one light</figcaption></figure>
+            <figure><img src="{{ url_for('static', filename='img/demo/studio-2.jpg') }}" alt="" loading="lazy" width="1000" height="1000"><figcaption>Window light, day two</figcaption></figure>
+            <figure><img src="{{ url_for('static', filename='img/demo/studio-3.jpg') }}" alt="" loading="lazy" width="1000" height="1000"><figcaption>Golden hour walk</figcaption></figure>
+            <figure><img src="{{ url_for('static', filename='img/demo/studio-4.jpg') }}" alt="" loading="lazy" width="1000" height="1000"><figcaption>Outdoor flash, winter</figcaption></figure>
+        </div>
     </div>
 </section>
 

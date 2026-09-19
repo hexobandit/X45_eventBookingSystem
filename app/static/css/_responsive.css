@@ -31,26 +31,18 @@
     .footer-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    .hero {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: auto;
+    }
 }
 
 /* Phones */
 @media (max-width: 640px) {
-    /* Oversize past the viewport so no photo edge is ever visible; quieter
-       so the wordmark stays the hero */
-    .hero-photo {
-        width: 135vw;
-        opacity: 0.35;
-    }
-
-    .hero-manifesto {
-        flex-direction: column;
-        gap: var(--sp-4);
-    }
-
-    .hero-manifesto .bar {
-        width: 2.2rem;
-        height: 1px;
-    }
+    .hero-title { max-width: none; }
+    .hero-stage { width: min(100%, 20rem); }
+    .studio-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .course-row {
         grid-template-columns: 4.5rem 1fr;

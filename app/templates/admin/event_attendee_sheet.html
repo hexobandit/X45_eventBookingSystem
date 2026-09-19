@@ -1,0 +1,240 @@
+{# Attendee sheet for the welcome desk. Standalone (no admin master):
+   prints on A4, "Save as PDF" goes through the browser print dialog,
+   PNG via vendored html2canvas. Colors are forced in print. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Attendee list – {{ event.title }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/_fonts.css') }}?v={{ asset_v }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_v }}">
+<style>
+:root { --ink: #14181C; --muted: #6B747C; --line: #E3E8EC; --blue: #2F5BFF; --paper: #fff; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #E9ECEF; color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; line-height: 1.4;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* toolbar (screen only) */
+.as-toolbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--line); }
+.as-toolbar .spacer { flex: 1; }
+.as-toolbar .hint { font-size: 0.78rem; color: var(--muted); }
+.as-toolbar .ra-btn { height: 36px; border-radius: 18px; }
+.ra-print { --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 8V3.5h10V8'/%3E%3Cpath d='M7 16H4.5a1 1 0 0 1-1-1V10a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1H17'/%3E%3Cpath d='M7 13.5h10v7H7z'/%3E%3C/svg%3E"); }
+.ra-pdf { --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3.5h8l5 5v12H6z'/%3E%3Cpath d='M14 3.5v5h5'/%3E%3Cpath d='M9 17v-5h1.8a1.5 1.5 0 0 1 0 3H9'/%3E%3C/svg%3E"); }
+.ra-image { --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='2'/%3E%3Ccircle cx='9' cy='9.5' r='1.7'/%3E%3Cpath d='M20.5 15.5l-4.5-4.5-7 7'/%3E%3C/svg%3E"); }
+.ra-back { --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5'/%3E%3Cpath d='M11 6l-6 6 6 6'/%3E%3C/svg%3E"); }
+
+/* sheet */
+.as-sheet { width: 210mm; max-width: 100%; margin: 24px auto 48px; background: var(--paper);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12); }
+.as-hero { position: relative; height: 62mm; background: var(--ink); color: #fff; overflow: hidden; }
+.as-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.as-hero::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(20,24,28,0.92) 0%, rgba(20,24,28,0.35) 55%, rgba(20,24,28,0.15) 100%); }
+.as-hero-text { position: absolute; left: 12mm; right: 12mm; bottom: 9mm; z-index: 1; }
+.as-eyebrow { display: flex; align-items: center; gap: 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; color: #cfd6dc; }
+.as-eyebrow .bar { width: 28px; height: 1px; background: var(--blue); }
+.as-hero h1 { margin: 8px 0 4px; font-size: 24px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.15; }
+.as-hero p { margin: 0; font-size: 12px; color: #dfe5ea; }
+.as-brand { position: absolute; top: 8mm; left: 12mm; z-index: 1; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; color: #fff; }
+.as-sheet-label { position: absolute; top: 8mm; right: 12mm; z-index: 1; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #cfd6dc; }
+
+.as-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-bottom: 1px solid var(--line); }
+.as-meta div { padding: 10px 12mm 10px 6mm; border-right: 1px solid var(--line); }
+.as-meta div:first-child { padding-left: 12mm; }
+.as-meta div:last-child { border-right: 0; }
+.as-meta .k { display: block; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.as-meta .v { font-size: 13px; font-weight: 500; }
+.as-meta .v small { font-weight: 400; color: var(--muted); }
+
+.as-body { padding: 8mm 12mm 10mm; }
+.as-section { margin: 0 0 7mm; }
+.as-section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3mm; }
+.as-section-head h2 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+.as-section-head span { font-size: 11px; color: var(--muted); }
+
+table.as-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.as-table th { text-align: left; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+  font-weight: 600; padding: 4px 6px 6px; border-bottom: 1.5px solid var(--ink); }
+.as-table td { padding: 7px 6px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 11.5px; overflow-wrap: anywhere; }
+.as-table td.phone { white-space: nowrap; }
+.as-table td.email { font-size: 10.5px; word-break: break-all; }
+.as-table tr { break-inside: avoid; page-break-inside: avoid; }
+.as-table thead { display: table-header-group; }
+.as-table .num { color: var(--muted); font-variant-numeric: tabular-nums; }
+.as-table .name { font-weight: 600; font-size: 12px; }
+.as-table .sub { display: block; font-weight: 400; font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+.as-box { display: inline-block; width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 3px; vertical-align: middle; }
+.as-pill { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+.as-pill.ok { background: #D1FAE5; color: #065F46; }
+.as-pill.warn { background: #FEF3C7; color: #92400E; }
+.as-pill.info { background: #DBEAFE; color: #1E40AF; }
+.as-pill.muted { background: #EEF1F4; color: #4B5560; }
+.as-method { font-size: 10px; color: var(--muted); white-space: nowrap; }
+.as-empty { padding: 10mm 0; text-align: center; color: var(--muted); }
+.as-foot { display: flex; justify-content: space-between; padding: 4mm 12mm 6mm; border-top: 1px solid var(--line);
+  font-size: 9.5px; color: var(--muted); }
+
+@page { size: A4 portrait; margin: 0; }
+@media print {
+  html, body { background: #fff; }
+  .as-toolbar { display: none !important; }
+  .as-sheet { width: 100%; margin: 0; box-shadow: none; }
+  .as-hero { height: 58mm; }
+  a { color: inherit; text-decoration: none; }
+}
+@media (max-width: 640px) {
+  .as-meta { grid-template-columns: 1fr 1fr; }
+  .as-meta div { padding-left: 6mm; }
+  .as-meta div:nth-child(2n) { border-right: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="as-toolbar">
+  <a class="ra-btn ra-btn-label" href="{{ return_url }}"><span class="ra-icon ra-back"></span><span>Back to registrations</span></a>
+  <span class="spacer"></span>
+  <span class="hint" id="pngStatus"></span>
+  <button type="button" class="ra-btn ra-btn-label" id="btnPng"><span class="ra-icon ra-image"></span><span>Download PNG</span></button>
+  <button type="button" class="ra-btn ra-btn-label" id="btnPdf"><span class="ra-icon ra-pdf"></span><span>Save as PDF</span></button>
+  <button type="button" class="ra-btn ra-btn-label ra-current" id="btnPrint" style="pointer-events:auto"><span class="ra-icon ra-print"></span><span>Print</span></button>
+</div>
+
+<div class="as-sheet" id="sheet">
+  <div class="as-hero">
+    {% if event.image_url %}<img src="{{ event.image_url }}" alt="" style="object-position: center {{ event.image_position_y|default(50) }}%">{% endif %}
+    <div class="as-brand">{{ site_name }}</div>
+    <div class="as-sheet-label">Attendee list</div>
+    <div class="as-hero-text">
+      <div class="as-eyebrow"><span class="bar"></span><span>{{ event.event_type|capitalize }} &middot; {{ event.formatted_date }}{% if event.end_date %} &ndash; {{ event.end_date.strftime('%-d %B %Y') }}{% endif %}</span></div>
+      <h1>{{ event.title }}</h1>
+      <p>{{ event.location }}{% if event.venue_name %} &middot; {{ event.venue_name }}{% endif %}</p>
+    </div>
+  </div>
+
+  <div class="as-meta">
+    <div>
+      <span class="k">Date &amp; time</span>
+      <span class="v">{{ event.event_date.strftime('%d.%m.%Y') }}{% if event.event_date.strftime('%H:%M') != '00:00' %} <small>{{ event.event_date.strftime('%H:%M') }}</small>{% endif %}
+        {%- if event.end_date %} <small>&ndash; {{ event.end_date.strftime('%d.%m.%Y') }}</small>{% endif %}</span>
+    </div>
+    <div>
+      <span class="k">Expected</span>
+      <span class="v">{{ expected|length }} <small>of {{ event.capacity }} seats</small></span>
+    </div>
+    <div>
+      <span class="k">Paid</span>
+      <span class="v">{{ paid_count }} <small>of {{ expected|length }}</small></span>
+    </div>
+    <div>
+      <span class="k">Waiting list</span>
+      <span class="v">{{ waitlist|length }}</span>
+    </div>
+  </div>
+
+  <div class="as-body">
+    <div class="as-section">
+      <div class="as-section-head">
+        <h2>Expected attendees</h2>
+        <span>tick on arrival &middot; sorted by surname</span>
+      </div>
+      {% if expected %}
+      <table class="as-table">
+        <colgroup>
+          <col style="width:7mm"><col style="width:8mm"><col style="width:40mm"><col style="width:34mm">
+          <col style="width:28mm"><col><col style="width:19mm">
+        </colgroup>
+        <thead>
+          <tr><th>#</th><th></th><th>Name</th><th>Organization</th><th>Phone</th><th>Email</th><th>Paid</th></tr>
+        </thead>
+        <tbody>
+          {% for r in expected %}
+          <tr>
+            <td class="num">{{ loop.index }}</td>
+            <td><span class="as-box"></span></td>
+            <td class="name">{{ r.last_name }} {{ r.first_name }}
+              {% if r.status.name == 'PENDING' %}<span class="sub"><span class="as-pill warn">Not confirmed</span></span>{% endif %}
+              {% if r.notes %}<span class="sub">{{ r.notes|truncate(90) }}</span>{% endif %}
+              {% if r.admin_note %}<span class="sub">Admin: {{ r.admin_note|truncate(90) }}</span>{% endif %}
+            </td>
+            <td>{{ r.organization or '' }}{% if r.billing_name and r.billing_name != r.organization %}<span class="sub">{{ r.billing_name }}</span>{% endif %}</td>
+            <td class="phone">{{ r.phone or '—' }}</td>
+            <td class="email">{{ r.email }}</td>
+            <td>
+              {% if r.payment_status.name == 'PAID' %}<span class="as-pill ok">Paid</span>
+              {% elif r.payment_status.name == 'REFUNDED' %}<span class="as-pill muted">Refunded</span>
+              {% else %}<span class="as-pill warn">Unpaid</span>{% endif %}
+              {% if r.payment_method %}<span class="sub as-method">{{ 'Card' if r.payment_method.name == 'CARD' else 'Bank' }}</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="as-empty">No confirmed or pending registrations yet.</div>
+      {% endif %}
+    </div>
+
+    {% if waitlist %}
+    <div class="as-section">
+      <div class="as-section-head">
+        <h2>Waiting list</h2>
+        <span>call if a seat frees up</span>
+      </div>
+      <table class="as-table">
+        <colgroup><col style="width:7mm"><col style="width:48mm"><col style="width:40mm"><col style="width:30mm"><col></colgroup>
+        <thead><tr><th>#</th><th>Name</th><th>Organization</th><th>Phone</th><th>Email</th></tr></thead>
+        <tbody>
+          {% for r in waitlist %}
+          <tr>
+            <td class="num">{{ loop.index }}</td>
+            <td class="name">{{ r.last_name }} {{ r.first_name }}</td>
+            <td>{{ r.organization or '' }}</td>
+            <td>{{ r.phone or '—' }}</td>
+            <td>{{ r.email }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="as-foot">
+    <span>Printed {{ generated_at.strftime('%d.%m.%Y %H:%M') }} &middot; cancelled registrations not listed</span>
+    <span>Internal &middot; contains personal data, dispose of after the event</span>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/vendor/html2canvas.min.js') }}?v=1.4.1"></script>
+<script>
+(function () {
+  document.getElementById('btnPrint').addEventListener('click', function () { window.print(); });
+  document.getElementById('btnPdf').addEventListener('click', function () {
+    // Browsers expose "Save as PDF" as a printer destination; that keeps the layout 1:1.
+    document.getElementById('pngStatus').textContent = 'In the print dialog choose "Save as PDF".';
+    window.print();
+  });
+  document.getElementById('btnPng').addEventListener('click', function () {
+    var status = document.getElementById('pngStatus');
+    if (!window.html2canvas) { status.textContent = 'PNG export unavailable.'; return; }
+    status.textContent = 'Rendering…';
+    html2canvas(document.getElementById('sheet'), { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+      .then(function (canvas) {
+        var a = document.createElement('a');
+        a.download = {{ (event.slug ~ '-attendees.png')|tojson }};
+        a.href = canvas.toDataURL('image/png');
+        document.body.appendChild(a); a.click(); a.remove();
+        status.textContent = '';
+      })
+      .catch(function (err) { status.textContent = 'PNG failed: ' + err.message; });
+  });
+})();
+</script>
+</body>
+</html>

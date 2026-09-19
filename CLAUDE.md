@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The **course booking engine** as a product: a Flask course-registration + payment site that is deployed once per client under their own domain, plus (a) a public demo instance of the engine and (b) a standalone static marketing page selling the build service (`marketing/`, Czech). The engine was extracted from the ANTERIOR client site (anteriorcourses.com), which now runs on its own and is never edited from here. `MARKETING_SITE_PLAN.md` is the working plan; `docs/nabidka-paudent-whatsapp.md` is the internal price list (prices are never shown on the marketing page).
 
-Dark public site, light Flask-Admin portal, PostgreSQL in production (SQLite `instance/dev.db` locally). Public site copy is English; Czech localisation of the engine is an open decision.
+Light "daylight studio" public theme (white ground, blue `#2F5BFF` for interactive elements, tungsten amber `#FFC24D` reserved for the light motif, Outfit display + Inter body, pill buttons), light Flask-Admin portal, PostgreSQL in production (SQLite `instance/dev.db` locally). Public site copy is English; Czech localisation of the engine is an open decision.
 
 ## Commands
 
@@ -49,6 +49,10 @@ Tests use `create_app('testing')`: in-memory SQLite, CSRF off, `EMAIL_ASYNC=Fals
 
 **Emails** (`app/services/email.py`): SMTP settings in the DB (`EmailSettings`, password Fernet-encrypted with a key derived from `SECRET_KEY`). Every send is logged. Templates in `templates/emails/` extend `base_email.html`; signatures use `site_authors_line`. Public routes send in a background thread unless `EMAIL_ASYNC` is False.
 
+**Course action vocabulary** (`docs/UPDATE.md` is the original handoff): every place a course appears offers the same four actions, icon-first, via the macro in `admin/_course_actions.html` — Registrations (`details_view`), Edit page (`visual_edit_view`), Payments & emails (`manage_view`), Delete, plus View on website. Flask-Admin list rows get them from `admin/model/row_actions.html` (overrides the bootstrap4 macros, so every `ModelView` picks the style up) and `EventModelView.get_list_row_actions()`. Icons are CSS masks (`.ra-icon` + `--ra-svg` data-URI) in `admin/_components.css`, never an icon font; tooltips come from `[data-tip]` handled by one fixed bubble created in `master.html`. Buttons show a spinner through `admin/_busy_buttons.html` (`window.setLoading`), included by `master.html` and `panel_base.html`; the confirm modal stays open and spins while the action runs.
+
+**Attendee sheet**: `EventModelView.attendee_sheet()` at `/admin/admin_events/attendee-sheet/?id=` renders `admin/event_attendee_sheet.html`, a standalone A4 welcome-desk list (expected + waitlist, cancelled excluded, tick boxes, paid pills). Print and "Save as PDF" both call `window.print()`; "Download PNG" uses the vendored `static/js/vendor/html2canvas.min.js`. Tests in `tests/test_admin_attendee_sheet.py`.
+
 **Course editor** is not a Flask-Admin form: `EventModelView.create_view`/`edit_view` redirect to `visual_edit_view`, posting JSON to `visual_edit_save` (`static/js/visual-edit.js`). `lecturers`/`program` are JSON in Text columns. A permanent hidden test course (`slug = test-event`, `is_test=True`) cannot be deleted and skips anti-spam.
 
 **Anti-spam** (`app/services/antispam.py`): honeypot `website`, HMAC time token `_form_token` (min 3 s), `_js_check`; blocks logged to `spam_logs`. Any new public form needs all three hidden inputs plus `check_spam()`.
@@ -57,7 +61,7 @@ Tests use `create_app('testing')`: in-memory SQLite, CSRF off, `EMAIL_ASYNC=Fals
 
 ## Conventions and gotchas
 
-- CSS is split into partials imported by `static/css/style.css` (public) and `static/css/admin.css` (admin); `base.html` links the public partials directly with `?v={{ asset_v }}`. nginx caches `/static/` for 30 days, so bump the `?v=` date on the `@import` lines when editing an admin partial. Public tokens in `_variables.css` (dark, accent `#29ABE2`); admin tokens in `admin/_variables.css`.
+- CSS is split into partials imported by `static/css/style.css` (public) and `static/css/admin.css` (admin); `base.html` links the public partials directly with `?v={{ asset_v }}`. nginx caches `/static/` for 30 days, so bump the `?v=` date on the `@import` lines when editing an admin partial. Public tokens in `_variables.css` (light theme; `--light`/`--light-soft` are the amber light colours, never used for buttons); admin tokens in `admin/_variables.css` (same daylight blue as the public site). The home hero (`index.html`, hero block in `_pages.css`, last section of `main.js`) is the interactive "cursor is the key light" scene: JS writes `--lx`/`--ly` on `#hero`, CSS derives the light pool, sphere highlight, cast shadow and headline shadow; modifier chips set `data-mod`. Touch devices get a CSS orbit animation, reduced motion a static lamp. Sentence-case labels everywhere; no uppercase micro-type.
 - Flask-Admin's native `confirm()` dialogs are replaced by the site modal (`_confirm_modal.html`, `window.showConfirm`); registration views register `window.deleteRegistrationRowHook` / `deleteRegistrationBulkHook`.
 - Jinja autoescapes HTML entities in expressions: write `'✓'`, not `'&#10003;'`, inside `{{ }}`.
 - `url_for('.manage_test_qr', id=...)` already contains `?id=`; append further params with `&`.

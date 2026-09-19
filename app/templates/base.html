@@ -16,7 +16,7 @@
 
     <meta name="description" content="{% block meta_description %}{{ site_description }}{% endblock %}">
     <meta name="author" content="{{ site_authors|join(', ') }}">
-    <meta name="theme-color" content="#070809">
+    <meta name="theme-color" content="#FFFFFF">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="{% block canonical_url %}{{ canonical_domain }}{{ request.path }}{% endblock %}">
@@ -75,7 +75,7 @@
     {% if demo_mode %}
     <div class="demo-banner" role="note">
         Demo site — every registration, payment and email here is simulated and the data is reset each night.
-        <a href="{{ url_for('admin_auth.login') }}">Open the admin</a> (admin@example.com / demo)
+        <a href="{{ url_for('admin_auth.login') }}">Open the admin</a> ({{ demo_admin_email }} / {{ demo_admin_password }})
     </div>
     {% endif %}
     <!-- Header -->

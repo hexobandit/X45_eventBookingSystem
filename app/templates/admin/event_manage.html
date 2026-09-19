@@ -1,15 +1,13 @@
 {% extends 'admin/master.html' %}
+{% from 'admin/_course_actions.html' import course_actions %}
 
 {% block body %}
 <!-- Header -->
 <div class="event-detail-header">
-    <a href="{{ return_url }}" class="back-link">&larr; Back to course detail</a>
+    <a href="{{ return_url }}" class="back-link">&larr; Back to registrations</a>
     <div class="event-detail-title">
-        <h1>Manage: {{ event.title }}</h1>
-        <div class="event-detail-actions">
-            <a href="{{ url_for('admin_events.visual_edit_view', id=event.id) }}" class="btn btn-primary btn-sm">Edit course</a>
-            <a href="{{ url_for('main.course_detail', slug=event.slug) }}" class="btn btn-secondary btn-sm" target="_blank">View on website &nearr;</a>
-        </div>
+        <h1>Payments &amp; emails: {{ event.title }}</h1>
+        {{ course_actions(event, current='payments', labels=True, website=True) }}
     </div>
 </div>
 
@@ -50,11 +48,13 @@
     <div class="dash-card-header">
         <h5>Payment details</h5>
         <div class="pay-method-status">
-            <span class="pay-method-chip {{ 'on' if event.has_domestic_payment }}" title="Domestic CZK transfer needs an account number and a CZK amount">
-                {{ '✓' if event.has_domestic_payment else '✗' }} Domestic CZK
+            <span class="pay-method-chip {{ 'on' if event.has_domestic_payment }}"
+                  title="Domestic CZK transfer needs an account number and a CZK amount">
+                {{ '✓' if event.has_domestic_payment else '✗' }} Domestic CZK transfer
             </span>
-            <span class="pay-method-chip {{ 'on' if event.has_sepa_payment }}" title="SEPA EUR transfer needs an IBAN and a EUR amount">
-                {{ '✓' if event.has_sepa_payment else '✗' }} SEPA EUR
+            <span class="pay-method-chip {{ 'on' if event.has_sepa_payment }}"
+                  title="SEPA EUR transfer needs a valid IBAN and a EUR amount">
+                {{ '✓' if event.has_sepa_payment else '✗' }} SEPA EUR transfer
             </span>
             <span class="pay-method-chip {{ 'on' if config.get('STRIPE_SECRET_KEY') and event.payment_amount_display }}" title="Card payments need the Stripe keys in the server .env and a course fee">
                 {{ '✓' if config.get('STRIPE_SECRET_KEY') and event.payment_amount_display else '✗' }} Card (Stripe)
@@ -66,8 +66,8 @@
         <input type="hidden" name="action" value="save_payment">
 
         <p class="pay-intro">
-            Participants who choose <strong>bank transfer</strong> receive an email with every method configured
-            below, each with its own QR code. Fill in one or both. Card payments (Stripe) use the course fee.
+            Participants who choose <strong>bank transfer</strong> get the details of the <strong>one</strong> method
+            selected below, with its QR code, straight in their confirmation email. Card payments (Stripe) use the course fee.
         </p>
 
         <div class="payment-form-grid">
@@ -102,11 +102,15 @@
             </div>
         </div>
 
+        <p class="pay-kind-hint">Both methods are independent — fill in one, both, or neither. Every complete
+            method is offered to participants with its own QR code in the payment email.</p>
+
         <div class="pay-methods">
             <!-- Domestic CZK -->
             <section class="pay-method" data-kind="domestic">
                 <header class="pay-method-head">
-                    <h6>Domestic transfer &middot; CZK</h6>
+                    <h6>Domestic transfer &middot; CZK
+                        <span class="pay-method-flag">{{ 'Offered' if event.has_domestic_payment else 'Not set up yet' }}</span></h6>
                     <span class="pay-method-sub">Czech account number &middot; QR platba (SPAYD) &middot; scanned by all Czech banking apps</span>
                 </header>
                 <div class="pay-method-fields">
@@ -151,7 +155,8 @@
             <!-- SEPA EUR -->
             <section class="pay-method" data-kind="sepa">
                 <header class="pay-method-head">
-                    <h6>SEPA transfer &middot; EUR</h6>
+                    <h6>SEPA transfer &middot; EUR
+                        <span class="pay-method-flag">{{ 'Offered' if event.has_sepa_payment else 'Not set up yet' }}</span></h6>
                     <span class="pay-method-sub">IBAN + BIC &middot; EPC QR (GiroCode) &middot; scanned by German, Austrian, Slovak… banking apps</span>
                 </header>
                 <div class="pay-method-fields">
@@ -190,13 +195,12 @@
 
         <div class="payment-form-actions">
             <button type="submit" class="btn btn-primary btn-sm">Save payment details</button>
-            {% if event.has_payment_details %}
+            {% set ready = (['Domestic'] if event.has_domestic_payment else []) + (['SEPA'] if event.has_sepa_payment else []) %}
+            {% if ready %}
             <span style="font-size:0.8rem; color: var(--status-confirmed-text);">&#10003;
-                {% if event.has_domestic_payment and event.has_sepa_payment %}Domestic and SEPA transfers set
-                {% elif event.has_domestic_payment %}Domestic transfer set
-                {% else %}SEPA transfer set{% endif %}</span>
+                {{ ready|join(' and ') }} transfer{{ 's' if ready|length > 1 }} set</span>
             {% else %}
-            <span style="font-size:0.8rem; color: var(--status-pending-text);">No bank-transfer method complete yet</span>
+            <span style="font-size:0.8rem; color: var(--status-pending-text);">No bank transfer is complete yet</span>
             {% endif %}
         </div>
     </form>

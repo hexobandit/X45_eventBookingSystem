@@ -2,35 +2,37 @@
    Components — buttons, forms, flash messages, badges
    ========================================================================== */
 
-/* --- Buttons: ghost hairline, fill on hover ------------------------------ */
+/* --- Buttons: pills ------------------------------------------------------- */
 
 .btn {
     display: inline-block;
-    padding: 0.85rem 2.25rem;
-    font-family: var(--font-body);
-    font-size: var(--fs-small);
-    font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-    background: transparent;
-    border: 1px solid var(--border-accent);
-    border-radius: var(--radius-sm);
+    padding: 0.85rem 1.6rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-body);
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-pill);
     cursor: pointer;
     text-align: center;
-    transition: color var(--transition-base),
-                background var(--transition-base),
-                border-color var(--transition-base);
+    line-height: 1.2;
+    transition: color var(--transition-fast),
+                background var(--transition-fast),
+                border-color var(--transition-fast),
+                transform var(--transition-fast);
 }
 
 .btn:hover {
-    color: var(--bg-body);
-    background: var(--accent);
-    border-color: var(--accent);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border-color: var(--text-primary);
 }
 
+.btn:active { transform: translateY(1px); }
+
 .btn-primary {
-    color: var(--bg-body);
+    color: #fff;
     background: var(--accent);
     border-color: var(--accent);
 }
@@ -38,12 +40,13 @@
 .btn-primary:hover {
     background: var(--accent-bright);
     border-color: var(--accent-bright);
-    color: var(--bg-body);
+    color: #fff;
 }
 
 .btn-outline {
     /* alias kept for existing templates */
     color: var(--accent);
+    border-color: var(--accent);
     background: transparent;
 }
 
@@ -79,11 +82,9 @@
 .form-label,
 label {
     display: block;
-    font-size: var(--fs-micro);
+    font-size: var(--fs-small);
     font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     margin-bottom: var(--sp-2);
 }
 
@@ -98,12 +99,12 @@ select {
     padding: 0.8rem 1rem;
     font-family: var(--font-body);
     font-size: var(--fs-body);
-    font-weight: 300;
+    font-weight: 400;
     color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: var(--bg-body);
+    border: 1.5px solid var(--border-color);
     border-radius: var(--radius-sm);
-    transition: border-color var(--transition-fast);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-control:focus,
@@ -112,6 +113,7 @@ textarea:focus,
 select:focus {
     outline: none;
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
 .form-control::placeholder,
@@ -127,7 +129,7 @@ textarea {
 
 select {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2329ABE2' stroke-width='1'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%232F5BFF' stroke-width='1'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
 }
@@ -169,9 +171,7 @@ select {
 
 .form-check label {
     font-size: var(--fs-small);
-    font-weight: 300;
-    letter-spacing: normal;
-    text-transform: none;
+    font-weight: 400;
     color: var(--text-secondary);
     margin: 0;
 }
@@ -209,7 +209,7 @@ select {
     color: var(--text-primary);
     background: var(--bg-elevated);
     border: 1px solid var(--border-color);
-    border-left: 2px solid var(--accent);
+    border-left: 4px solid var(--accent);
     border-radius: var(--radius-sm);
     box-shadow: var(--shadow-md);
     cursor: pointer;
@@ -230,26 +230,23 @@ select {
 
 .badge {
     display: inline-block;
-    padding: 0.2rem 0.7rem;
+    padding: 0.25rem 0.75rem;
     font-size: var(--fs-micro);
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    border: 1px solid var(--border-accent);
-    border-radius: var(--radius-sm);
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    background: var(--accent-dim);
     color: var(--accent);
 }
 
-.badge-warning { color: var(--warning); border-color: rgba(217, 188, 126, 0.4); }
-.badge-error   { color: var(--error);   border-color: rgba(217, 142, 126, 0.4); }
+.badge-warning { color: var(--warning); background: rgba(168, 106, 0, 0.12); }
+.badge-error   { color: var(--error);   background: rgba(201, 67, 47, 0.12); }
 
 /* --- Back link ---------------------------------------------------------------- */
 
 .back-link {
     display: inline-block;
     font-size: var(--fs-small);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-weight: 500;
     color: var(--text-muted);
     margin-bottom: var(--sp-8);
 }
@@ -269,7 +266,7 @@ select {
     align-items: center;
     justify-content: center;
     gap: var(--sp-8);
-    background: rgba(7, 8, 9, 0.88);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     opacity: 0;
@@ -335,10 +332,8 @@ select {
     display: flex;
     align-items: baseline;
     font-size: var(--fs-small);
-    letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
+    font-weight: 500;
     color: var(--text-secondary);
-    padding-left: var(--tracking-eyebrow);
 }
 
 .wait-text .dot {
@@ -379,8 +374,8 @@ select {
     right: 0;
     z-index: 950;
     padding: 0.6rem var(--sp-6);
-    background: var(--accent);
-    color: #06121a;
+    background: var(--text-primary);
+    color: #fff;
     font-size: var(--fs-small);
     text-align: center;
     line-height: 1.4;

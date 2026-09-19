@@ -17,7 +17,7 @@ html {
 
 body {
     font-family: var(--font-body);
-    font-weight: 300;
+    font-weight: 400;
     font-size: var(--fs-body);
     line-height: var(--lh-body);
     color: var(--text-secondary);
@@ -28,16 +28,16 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 200;
+    font-weight: 600;
     color: var(--text-primary);
-    line-height: 1.25;
-    text-transform: uppercase;
+    line-height: 1.15;
     letter-spacing: var(--tracking-display);
+    text-wrap: balance;
 }
 
 h1 { font-size: var(--fs-h1); }
 h2 { font-size: var(--fs-h2); }
-h3 { font-size: var(--fs-h3); letter-spacing: 0.16em; }
+h3 { font-size: var(--fs-h3); letter-spacing: -0.01em; }
 
 p {
     margin-bottom: var(--sp-4);
@@ -54,7 +54,7 @@ a:hover {
 }
 
 strong {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
 }
 
@@ -74,34 +74,35 @@ img {
 }
 
 ::selection {
-    background: var(--accent-deep);
+    background: var(--light-soft);
     color: var(--text-primary);
 }
 
-/* Visible keyboard focus — blue hairline */
+/* Visible keyboard focus */
 :focus-visible {
-    outline: 1px solid var(--accent);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
+    border-radius: 4px;
 }
 
-/* Eyebrow label — the quiet uppercase marker used across the site */
+/* Eyebrow label — small, sentence case, blue */
 .eyebrow {
     display: block;
-    font-family: var(--font-body);
-    font-size: var(--fs-micro);
-    font-weight: 500;
+    font-family: var(--font-display);
+    font-size: var(--fs-small);
+    font-weight: 600;
     letter-spacing: var(--tracking-eyebrow);
-    text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: var(--sp-4);
+    margin-bottom: var(--sp-3);
 }
 
-/* Hairline rules — the E|A|E vertical made horizontal */
+/* Short rules */
 .rule {
     border: 0;
-    height: 1px;
-    background: var(--border-accent);
-    width: 4rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--light);
+    width: 3rem;
     margin: var(--sp-6) 0;
 }
 

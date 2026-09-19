@@ -31,6 +31,10 @@ class Config:
     # for other visitors (users, SMTP settings, password, deleting courses).
     # The demo database is expected to be reset nightly (flask seed-events --reset).
     DEMO_MODE = os.environ.get('DEMO_MODE', '0') == '1'
+    # Credentials shown in the demo banner and typed into the login form.
+    # Purely informational: create the user with `flask create-admin`.
+    DEMO_ADMIN_EMAIL = os.environ.get('DEMO_ADMIN_EMAIL', 'admin@example.com')
+    DEMO_ADMIN_PASSWORD = os.environ.get('DEMO_ADMIN_PASSWORD', 'demo-2026')
 
     # Stripe card payments (empty = card option hidden, bank transfer still works)
     STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')

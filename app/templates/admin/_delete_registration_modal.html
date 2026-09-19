@@ -185,8 +185,9 @@
         hidden(form, 'delete_reason', reason.value.trim());
         hidden(form, 'send_cancel_email', sendCb.checked ? '1' : '');
         hidden(form, 'include_reason', (sendCb.checked && inclCb.checked) ? '1' : '');
-        okBtn.disabled = true;
-        modal.classList.remove('active');
+        // Stay open with a spinner until the server answers (page navigates).
+        modal.querySelector('.manage-modal').classList.add('is-busy');
+        if (window.setLoading) window.setLoading(okBtn); else okBtn.disabled = true;
         pendingForm = null;
         var submitBtn = form.querySelector('[type="submit"]');
         if (submitBtn) submitBtn.removeAttribute('onclick');

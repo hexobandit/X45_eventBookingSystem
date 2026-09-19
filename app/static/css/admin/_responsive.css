@@ -89,10 +89,10 @@
     .event-mini > a:first-child { flex-wrap: wrap; gap: 10px 12px; }
     .event-mini-info { flex-basis: 55%; }
     .event-mini-stats { text-align: left; }
-    .event-mini > a.btn-brand-outline {
-        margin-left: 0 !important;
+    .event-mini > .ra-group {
+        margin-left: 0;
         margin-top: 10px;
         width: 100%;
-        text-align: center;
+        justify-content: flex-end;
     }
 }

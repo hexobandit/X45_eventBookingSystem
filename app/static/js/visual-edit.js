@@ -703,10 +703,16 @@
         var base = $('coursesBaseUrl').value.replace(/\/$/, '');
         var pageUrl = base + '/' + encodeURIComponent(slug);
 
-        var viewBtn = $('viewSiteBtn');
-        if (viewBtn) {
-            viewBtn.href = pageUrl;
-            viewBtn.style.display = '';
+        // New course: header action buttons were rendered hidden; fill + show.
+        var actions = $('courseActions');
+        if (actions && eventId) {
+            var reg = actions.querySelector('[data-role="registrations"]');
+            var pay = actions.querySelector('[data-role="payments"]');
+            var site = actions.querySelector('[data-role="website"]');
+            if (reg) reg.href = actions.getAttribute('data-url-registrations').replace('__ID__', eventId);
+            if (pay) pay.href = actions.getAttribute('data-url-payments').replace('__ID__', eventId);
+            if (site) site.href = pageUrl;
+            actions.hidden = false;
         }
 
         var frame = $('fullPreviewFrame');

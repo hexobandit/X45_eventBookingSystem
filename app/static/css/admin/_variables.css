@@ -1,8 +1,8 @@
 /* ==========================================================================
    Admin Variables - Design Tokens
-   Light admin, aligned to the site's black-and-white + rubber-dam-blue
-   identity: cool near-black surfaces (sidebar) + blue accents on a cool
-   off-white. Accent darkened vs the site's #29ABE2 for contrast on light.
+   Light admin, aligned to the public site: cool near-black surfaces
+   (sidebar) + the site's daylight blue on a cool off-white. The accent is
+   darkened against the site's #2F5BFF so it stays readable on light.
    ========================================================================== */
 
 :root {
@@ -10,10 +10,10 @@
     --admin-primary: #14181C;
     --admin-primary-light: #232A31;
 
-    /* Rubber-dam blue — the site accent (#29ABE2 family) */
-    --admin-accent: #1E85BD;
-    --admin-accent-bright: #29ABE2;
-    --admin-accent-deep: #16628A;
+    /* Daylight blue — the site accent (#2F5BFF family) */
+    --admin-accent: #2F5BFF;
+    --admin-accent-bright: #5478FF;
+    --admin-accent-deep: #1533B8;
 
     /* Admin Backgrounds — cool off-white to echo the site */
     --admin-bg: #F2F4F6;

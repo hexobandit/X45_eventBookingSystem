@@ -14,12 +14,12 @@
 
 /* NOTE: nginx caches /static/ for 30 days (immutable). The ?v= on these
    imports busts that cache — bump the date when you edit a partial. */
-@import 'admin/_variables.css?v=20260918d';
-@import 'admin/_layout.css?v=20260918d';
-@import 'admin/_components.css?v=20260918d';
-@import 'admin/_dashboard.css?v=20260918a';
-@import 'admin/_flask-admin.css?v=20260918a';
-@import 'admin/_responsive.css?v=20260918a';
-@import 'admin/_settings.css?v=20260918d';
-@import 'admin/_manage.css?v=20260918d';
-@import 'admin/_visual-edit.css?v=20260918d';
+@import 'admin/_variables.css?v=20260919b';
+@import 'admin/_layout.css?v=20260919b';
+@import 'admin/_components.css?v=20260919b';
+@import 'admin/_dashboard.css?v=20260919b';
+@import 'admin/_flask-admin.css?v=20260919b';
+@import 'admin/_responsive.css?v=20260919b';
+@import 'admin/_settings.css?v=20260919b';
+@import 'admin/_manage.css?v=20260919b';
+@import 'admin/_visual-edit.css?v=20260919b';

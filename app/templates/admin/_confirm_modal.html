@@ -43,15 +43,29 @@
         return false;
     };
 
+    var box = modal.querySelector('.manage-modal');
+
     function closeModal() {
         modal.classList.remove('active');
+        box.classList.remove('is-busy');
+        if (window.setLoading) window.setLoading(okBtn, false);
         pendingCallback = null;
     }
 
     okBtn.addEventListener('click', function(){
         var cb = pendingCallback;
-        closeModal();
-        if (cb) cb();
+        pendingCallback = null;
+        if (!cb) { closeModal(); return; }
+        // Keep the dialog open with a spinner while the server works. A callback
+        // that submits a form ends with navigation; one that fetches returns a
+        // promise and we close when it settles.
+        box.classList.add('is-busy');
+        if (window.setLoading) window.setLoading(okBtn);
+        var result;
+        try { result = cb(); } catch (err) { closeModal(); throw err; }
+        if (result && typeof result.then === 'function') {
+            result.then(closeModal, closeModal);
+        }
     });
 
     document.getElementById('confirmCloseX').addEventListener('click', closeModal);

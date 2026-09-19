@@ -75,6 +75,7 @@ nature / preview routes and assets removed, GA + Cloudflare trackers removed,
 `seed-events` rewritten (3 courses, 6 registrations, `--reset` for nightly
 reset), `DEMO_MODE` (`app/demo.py` guard, banners, public email preview
 route), favicon/OG generated from the brand name, 123 tests green.
+Redesigned 19 Sep: light "daylight studio" theme + interactive light hero (cursor = lamp, modifier chips), Outfit font self-hosted.
 Open: engine public copy is **English** (inherited from ANTERIOR). Czech
 prospects will see an EN demo. Decide: keep EN + sell CZ localisation as an
 add-on, or localise the engine (templates + emails, ~2 days) before launch.
@@ -153,7 +154,16 @@ SEO targets (title/H1/meta): „rezervační systém pro kurzy", „registrace n
 s online platbou", „web pro školení a workshopy", „prodej vstupenek bez
 provize".
 
-## Step 5 — Build the page
+## Step 5 — Build the page — BUILT 18 Sep (v1 in `marketing/`)
+
+`marketing/index.html` + `css/style.css` + `js/main.js`, `zasady.html`,
+robots/sitemap, favicons + `img/og.png`. Serve locally with
+`python3 -m http.server 8080` inside `marketing/`; demo links auto-point to
+`127.0.0.1:5000` when opened from localhost. Still TODO before launch: real
+phone/e-mail/IČO (grep `TODO` in the HTML), self-host the Bricolage Grotesque
+font, replace the CSS mock screens with real demo screenshots if wanted,
+verify competitor claims in the comparison table.
+
 
 - Static HTML + CSS, no framework, no build step; one JS file for the smooth
   scroll and the WhatsApp link. Light theme (B2B, prints well, contrasts with

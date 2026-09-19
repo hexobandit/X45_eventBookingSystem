@@ -32,7 +32,7 @@
 <body>
 {% block page_body %}
 {% if demo_mode %}
-<div class="demo-banner" role="note">Demo admin — shared login, data resets nightly. Creating users, changing SMTP settings or the password, and deleting courses are disabled.</div>
+<div class="demo-banner" role="note">Demo admin — shared login ({{ demo_admin_email }} / {{ demo_admin_password }}), data resets nightly. Creating users, changing SMTP settings or the password, and deleting courses are disabled.</div>
 {% endif %}
 <div class="admin-dashboard">
     <!-- Mobile burger toggle -->
@@ -153,6 +153,28 @@
 
     {% block tail %}
     {% endblock %}
+    {% include 'admin/_busy_buttons.html' %}
+    <script {{ admin_csp_nonce_attribute }}>
+    // Tooltips for icon buttons: [data-tip] -> one fixed bubble on <body>
+    // (fixed so the table card's overflow:hidden can't clip it).
+    (function () {
+        var tip = null;
+        function show(el) {
+            if (!tip) { tip = document.createElement('div'); tip.className = 'ra-tip'; document.body.appendChild(tip); }
+            var r = el.getBoundingClientRect();
+            tip.textContent = el.getAttribute('data-tip');
+            tip.style.left = (r.left + r.width / 2) + 'px';
+            tip.style.top = r.top + 'px';
+            tip.classList.add('show');
+        }
+        function hide() { if (tip) tip.classList.remove('show'); }
+        document.addEventListener('mouseover', function (e) { var el = e.target.closest && e.target.closest('[data-tip]'); if (el) show(el); });
+        document.addEventListener('mouseout',  function (e) { var el = e.target.closest && e.target.closest('[data-tip]'); if (el) hide(); });
+        document.addEventListener('focusin',   function (e) { var el = e.target.closest && e.target.closest('[data-tip]'); if (el) show(el); });
+        document.addEventListener('focusout',  hide);
+        window.addEventListener('scroll', hide, true);
+    })();
+    </script>
     <script>
     // Replace Flask-Admin's native confirm() dialogs with the site confirm modal.
     // Placed after the tail block so the list view's modelActions already exists.

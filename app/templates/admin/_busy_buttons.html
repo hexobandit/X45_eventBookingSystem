@@ -1,0 +1,36 @@
+{# Busy buttons: spinner + no double clicks while the server works.
+   Included by master.html and panel_base.html (iframe panel). #}
+    <script {{ admin_csp_nonce_attribute }}>
+    // Busy buttons: spinner + no double clicks while the server works.
+    // Any real form submit marks its submit button; modals call setLoading()
+    // on their OK button themselves (form.submit() fires no submit event).
+    (function () {
+        window.setLoading = function (btn, on) {
+            if (!btn) return;
+            if (on === false) {
+                btn.classList.remove('is-loading');
+                btn.removeAttribute('aria-busy');
+                if (btn.dataset.wasDisabled !== '1') btn.disabled = false;
+                delete btn.dataset.wasDisabled;
+                return;
+            }
+            btn.classList.add('is-loading');
+            btn.setAttribute('aria-busy', 'true');
+            btn.dataset.wasDisabled = btn.disabled ? '1' : '0';
+            // Disable a tick later so the button's name/value still reach the form data.
+            setTimeout(function () { btn.disabled = true; }, 0);
+        };
+        document.addEventListener('submit', function (e) {
+            if (e.defaultPrevented) return;
+            var form = e.target;
+            if (form.method && form.method.toLowerCase() !== 'post') return;
+            var btn = e.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+            window.setLoading(btn);
+        });
+        // Back button / bfcache: nothing is loading any more.
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('.is-loading').forEach(function (b) { window.setLoading(b, false); });
+            document.querySelectorAll('.manage-modal.is-busy').forEach(function (m) { m.classList.remove('is-busy'); });
+        });
+    })();
+    </script>

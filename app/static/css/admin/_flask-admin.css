@@ -248,20 +248,17 @@
     border-radius: 3px;
 }
 
-/* ---- Row Action Links ---- */
+/* ---- Row Action Links ----
+   Icon buttons themselves (.ra-btn / .ra-icon) live in _components.css so
+   the dashboard and course pages share them; here only the list-cell fit. */
 .admin-main .list-buttons-column {
     white-space: nowrap;
 }
-.admin-main .list-buttons-column a {
-    color: var(--admin-primary);
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin-right: 14px;
-    text-decoration: none;
-    transition: color 0.15s;
-}
-.admin-main .list-buttons-column a:hover {
-    color: var(--admin-accent);
+.admin-main .list-buttons-column a.icon,
+.admin-main .list-buttons-column form.icon {
+    display: inline-flex;
+    vertical-align: middle;
+    margin: 0 4px 0 0;
 }
 
 /* ---- Pagination ---- */
@@ -589,13 +586,6 @@
 }
 .capacity-bar-list .capacity-bar-fill { display: block; }
 .reg-link { text-decoration: none; }
-
-.btn-list-manage {
-    padding: 3px 10px;
-    font-size: 0.78rem;
-    border-radius: 6px;
-    white-space: nowrap;
-}
 
 .badge-method {
     display: inline-block;

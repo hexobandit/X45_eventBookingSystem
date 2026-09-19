@@ -1,0 +1,52 @@
+{# Overrides flask_admin/templates/bootstrap4/admin/model/row_actions.html.
+   Same macro names/signatures, own icon markup (.ra-btn / .ra-icon, see
+   admin/_components.css). Tooltips via data-tip (master.html). The delete
+   button keeps class "icon" + the onclick fallback that master.html's
+   confirm-modal handler relies on. #}
+{% import 'admin/lib.html' as lib with context %}
+
+{% macro link(action, url, icon_class=None) %}
+<a class="icon ra-btn" href="{{ url }}" data-tip="{{ action.title or '' }}" aria-label="{{ action.title or '' }}">
+  <span class="{{ icon_class or action.icon_class }}"></span>
+</a>
+{% endmacro %}
+
+{% macro view_row(action, row_id, row) %}
+  {{ link(action, get_url('.details_view', id=row_id, url=return_url), 'ra-icon ra-eye') }}
+{% endmacro %}
+
+{% macro view_row_popup(action, row_id, row) %}
+  {{ lib.add_modal_button(url=get_url('.details_view', id=row_id, url=return_url, modal=True), title=action.title, content='<span class="ra-icon ra-eye"></span>') }}
+{% endmacro %}
+
+{% macro edit_row(action, row_id, row) %}
+  {{ link(action, get_url('.edit_view', id=row_id, url=return_url), 'ra-icon ra-pencil') }}
+{% endmacro %}
+
+{% macro edit_row_popup(action, row_id, row) %}
+  {{ lib.add_modal_button(url=get_url('.edit_view', id=row_id, url=return_url, modal=True), title=action.title, content='<span class="ra-icon ra-pencil"></span>') }}
+{% endmacro %}
+
+{# Courses only (EventModelView.get_list_row_actions) #}
+{% macro registrations_row(action, row_id, row) %}
+  {{ link(action, get_url('.details_view', id=row_id, url=return_url), 'ra-icon ra-people') }}
+{% endmacro %}
+
+{% macro payments_row(action, row_id, row) %}
+  {{ link(action, get_url('.manage_view', id=row_id), 'ra-icon ra-money') }}
+{% endmacro %}
+
+{% macro delete_row(action, row_id, row) %}
+<form class="icon" method="POST" action="{{ get_url('.delete_view') }}">
+  {{ delete_form.id(value=get_pk_value(row)) }}
+  {{ delete_form.url(value=return_url) }}
+  {% if delete_form.csrf_token is defined and delete_form.csrf_token %}
+  {{ delete_form.csrf_token }}
+  {% elif csrf_token is defined and csrf_token %}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  {% endif %}
+  <button class="ra-btn ra-danger" onclick="return faHelpers.safeConfirm('{{ _gettext('Are you sure you want to delete this record?') }}');" data-tip="{{ _gettext('Delete') }}" aria-label="{{ _gettext('Delete') }}">
+    <span class="ra-icon ra-trash"></span>
+  </button>
+</form>
+{% endmacro %}

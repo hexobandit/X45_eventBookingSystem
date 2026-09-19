@@ -83,20 +83,10 @@
     background: var(--admin-accent-bright);
 }
 
-.ve-view-btn {
-    padding: 7px 14px;
-    border: 1px solid var(--admin-border-medium);
-    border-radius: var(--admin-radius-xs);
-    font-size: 0.82rem;
-    color: var(--admin-text-secondary);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.ve-view-btn:hover {
-    background: var(--admin-bg-subtle);
-    color: var(--admin-text);
-    text-decoration: none;
+.ve-header-right .ra-group {
+    margin-left: 8px;
+    padding-left: 16px;
+    border-left: 1px solid var(--admin-border-medium);
 }
 
 /* --- Mobile Tab Switcher --- */
@@ -907,7 +897,7 @@
         font-size: 0.82rem;
     }
 
-    .ve-view-btn {
+    .ve-header-right .ra-group {
         display: none;
     }
 
