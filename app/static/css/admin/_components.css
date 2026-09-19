@@ -230,6 +230,30 @@
 }
 .ra-btn.is-loading::before { margin-right: 0; }
 .ra-btn.is-loading .ra-icon { display: none; }
+
+/* Icons used by the registration page */
+.ra-clock {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
+}
+.ra-card {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='5.5' width='19' height='13' rx='2'/%3E%3Cpath d='M2.5 10h19'/%3E%3Cpath d='M6 14.5h4'/%3E%3C/svg%3E");
+}
+.ra-mail {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.5' y='5' width='19' height='14' rx='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E");
+}
+.ra-dots {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'%3E%3Ccircle cx='6' cy='12' r='1.7'/%3E%3Ccircle cx='12' cy='12' r='1.7'/%3E%3Ccircle cx='18' cy='12' r='1.7'/%3E%3C/svg%3E");
+}
+.ra-caret {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
+}
+.ra-back {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5'/%3E%3Cpath d='M11 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
+.ra-check-circle {
+    --ra-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M8.2 12.3l2.6 2.6 5-5.2'/%3E%3C/svg%3E");
+}
+
 .ra-btn-label.is-loading::before { margin-right: 7px; }
 .manage-modal.is-busy .manage-modal-close,
 .manage-modal.is-busy .btn-secondary {

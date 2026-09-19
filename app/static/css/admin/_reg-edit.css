@@ -1,0 +1,533 @@
+/* ==========================================================================
+   Registration page (admin/edit_registration.html)
+   Two columns: the attendee's own data on the left, what the office did with
+   it on the right. One sticky save bar at the bottom, in the panel iframe too.
+   ========================================================================== */
+
+.re-page {
+    padding-bottom: 88px;   /* room for the sticky bar */
+}
+
+/* --- Header ---------------------------------------------------------------- */
+
+.re-crumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--admin-text-muted);
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+
+.re-crumb a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--admin-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.re-crumb a:hover { text-decoration: underline; }
+.re-crumb .ra-icon { width: 15px; height: 15px; }
+.re-crumb .re-crumb-tail { color: var(--admin-text-muted); }
+
+.re-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.re-head h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--admin-text);
+}
+
+.re-head-sub {
+    margin: 2px 0 0;
+    font-size: 0.95rem;
+    color: var(--admin-text-muted);
+}
+
+.re-head-sub a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--admin-border-medium); }
+.re-head-sub a:hover { color: var(--admin-accent); border-color: currentColor; }
+
+.re-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.re-head-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* --- Chips ----------------------------------------------------------------- */
+
+.re-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: var(--admin-radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.re-chip .ra-icon { width: 16px; height: 16px; }
+
+.re-chip.is-pending   { background: var(--status-pending-bg);   color: var(--status-pending-text); }
+.re-chip.is-confirmed { background: var(--status-confirmed-bg); color: var(--status-confirmed-text); }
+.re-chip.is-cancelled { background: var(--status-cancelled-bg); color: var(--status-cancelled-text); }
+.re-chip.is-waitlist  { background: var(--status-waitlist-bg);  color: var(--status-waitlist-text); }
+.re-chip.is-paid      { background: var(--status-confirmed-bg); color: var(--status-confirmed-text); }
+.re-chip.is-unpaid    { background: var(--status-pending-bg);   color: var(--status-pending-text); }
+.re-chip.is-refunded  { background: var(--admin-bg-subtle);     color: var(--admin-text-secondary); }
+
+/* --- Menus (Send email / More) --------------------------------------------- */
+
+.re-menu { position: relative; }
+
+.re-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    cursor: pointer;
+}
+
+.re-menu-btn:hover { border-color: var(--admin-text-secondary); }
+.re-menu-btn .ra-icon { width: 16px; height: 16px; }
+
+.re-menu-list {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 40;
+    min-width: 232px;
+    padding: 6px;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+    box-shadow: 0 12px 28px -12px rgba(20, 24, 28, 0.35);
+}
+
+.re-menu-list[hidden] { display: none; }
+
+.re-menu-list button,
+.re-menu-list a {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    background: none;
+    border: 0;
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-align: left;
+    color: var(--admin-text);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.re-menu-list button:hover,
+.re-menu-list a:hover { background: var(--admin-bg-subtle); }
+.re-menu-list button:disabled { color: var(--admin-text-muted); cursor: default; background: none; }
+.re-menu-list .re-menu-danger { color: var(--accent-red); }
+.re-menu-list .re-menu-danger:hover { background: var(--status-cancelled-bg); }
+.re-menu-sep { height: 1px; margin: 6px 4px; background: var(--admin-border-medium); }
+
+/* --- Grid ------------------------------------------------------------------ */
+
+.re-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.re-card {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-light);
+    border-radius: var(--admin-radius);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.re-card h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--admin-text);
+}
+
+.re-card-sub {
+    margin: 4px 0 20px;
+    font-size: 0.88rem;
+    color: var(--admin-text-muted);
+}
+
+/* --- Fields ---------------------------------------------------------------- */
+
+.re-field { margin-bottom: 16px; }
+.re-field:last-child { margin-bottom: 0; }
+
+.re-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.re-row:last-child { margin-bottom: 0; }
+.re-row > .re-field { margin-bottom: 0; }   /* the grid gap does the spacing */
+
+.re-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--admin-text);
+}
+
+.re-field input[type="text"],
+.re-field input[type="email"],
+.re-field input[type="tel"],
+.re-field input[type="number"],
+.re-field input:not([type]),
+.re-field select,
+.re-field textarea {
+    width: 100%;
+    box-sizing: border-box;   /* admin CSS is not border-box by default */
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--admin-text);
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+}
+
+.re-field textarea { min-height: 88px; resize: vertical; }
+.re-field textarea[readonly] { min-height: 64px; }
+
+.re-field input:focus,
+.re-field select:focus,
+.re-field textarea:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+    box-shadow: 0 0 0 3px var(--accent-blue-bg);
+}
+
+.re-field input[readonly],
+.re-field textarea[readonly],
+.re-field select[disabled],
+.re-field input[disabled] {
+    background: var(--admin-bg-subtle);
+    color: var(--admin-text-secondary);
+}
+
+.re-hint { margin: 6px 0 0; font-size: 0.78rem; color: var(--admin-text-muted); }
+.re-error { margin: 6px 0 0; font-size: 0.8rem; color: var(--accent-red); }
+
+.re-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 26px;
+}
+
+.re-label-row label { margin-bottom: 0; }
+
+.re-label-note {
+    font-weight: 400;
+    color: var(--admin-text-muted);
+}
+
+/* Small "Edit" pill that unlocks email / phone */
+.re-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    margin-bottom: 6px;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    cursor: pointer;
+}
+
+.re-edit-btn:hover { border-color: var(--admin-accent); color: var(--admin-accent); }
+.re-edit-btn .ra-icon { width: 13px; height: 13px; }
+
+/* --- Right column ---------------------------------------------------------- */
+
+.re-side-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    min-height: 32px;
+}
+
+.re-side-label { font-size: 0.9rem; color: var(--admin-text-secondary); }
+
+.re-side-title { margin-bottom: 22px; }
+
+.re-side-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    border-radius: var(--admin-radius-sm);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--admin-text);
+    text-align: center;
+    cursor: pointer;
+}
+
+.re-side-btn .ra-icon { width: 17px; height: 17px; }
+.re-side-btn:hover { border-color: var(--admin-accent); color: var(--admin-accent); background: var(--accent-blue-bg); }
+
+.re-side-hint {
+    margin: 8px 0 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--admin-text-muted);
+}
+.re-side-btn.is-danger:hover { border-color: var(--accent-red); color: var(--accent-red); background: var(--status-cancelled-bg); }
+
+.re-divider { height: 1px; margin: 22px 0; background: var(--admin-border-light); }
+
+.re-comm-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--admin-border-light);
+    font-size: 0.9rem;
+}
+
+.re-comm-row:last-of-type { border-bottom: 0; }
+.re-comm-row .re-comm-name { color: var(--admin-text-secondary); }
+.re-comm-state { display: flex; align-items: center; gap: 8px; text-align: right; }
+
+.re-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--admin-border-medium);
+    flex-shrink: 0;
+}
+
+.re-dot.is-on { background: var(--accent-green); }
+.re-comm-state.is-on .re-comm-text { color: var(--accent-green); font-weight: 600; }
+.re-comm-time { display: block; font-size: 0.78rem; color: var(--admin-text-muted); }
+
+.re-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--admin-accent);
+    text-decoration: none;
+}
+
+.re-card-link:hover { text-decoration: underline; }
+.re-note { margin-top: 14px; }
+
+/* --- Collapsibles (consent, advanced) -------------------------------------- */
+
+.re-fold { padding: 0; }
+.re-fold > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px 24px;
+    list-style: none;
+    cursor: pointer;
+}
+
+.re-fold > summary::-webkit-details-marker { display: none; }
+.re-fold > summary h2 { font-size: 1.15rem; }
+
+.re-fold-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.re-fold-caret { width: 18px; height: 18px; color: var(--admin-text-muted); transition: transform 0.15s ease; }
+.re-fold[open] .re-fold-caret { transform: rotate(180deg); }
+.re-fold-body { padding: 0 24px 24px; }
+
+/* --- Sticky save bar -------------------------------------------------------- */
+
+.re-bar {
+    position: fixed;
+    left: var(--admin-sidebar-width, 260px);
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 32px;
+    background: var(--admin-bg-card);
+    border-top: 1px solid var(--admin-border-medium);
+    box-shadow: 0 -8px 24px -18px rgba(20, 24, 28, 0.4);
+}
+
+body.panel-mode .re-bar { left: 0; padding: 12px 20px; }
+
+.re-dirty {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--admin-text-muted);
+}
+
+.re-dirty::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--admin-border-medium);
+}
+
+.re-dirty.is-dirty { color: var(--admin-text); font-weight: 600; }
+.re-dirty.is-dirty::before { background: var(--accent-amber); }
+
+.re-bar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+.re-btn-save,
+.re-btn-cancel {
+    height: 40px;
+    padding: 0 22px;
+    border-radius: var(--admin-radius-sm);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.re-btn-cancel {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border-medium);
+    color: var(--admin-text);
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.re-btn-cancel:hover { border-color: var(--admin-text-secondary); color: var(--admin-text); }
+
+.re-btn-save {
+    background: var(--admin-accent);
+    border: 1px solid var(--admin-accent);
+    color: #fff;
+}
+
+.re-btn-save:hover { background: var(--admin-accent-deep); border-color: var(--admin-accent-deep); }
+
+/* --- Email / phone unlock --------------------------------------------------- */
+
+.re-unlock {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--admin-accent);
+    cursor: pointer;
+}
+
+.re-unlock:hover { text-decoration: underline; }
+
+.re-unlock-confirm {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--accent-amber-bg);
+    border: 1px solid #FDBA74;
+    border-radius: var(--admin-radius-xs);
+    font-size: 0.82rem;
+    color: #9A3412;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.re-unlock-confirm span { flex: 1; min-width: 180px; }
+
+.re-unlock-confirm button {
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.re-unlock-yes { background: #EA580C; color: #fff; border: 0; }
+.re-unlock-yes:hover { background: #C2410C; }
+.re-unlock-no { background: transparent; color: #9A3412; border: 1px solid #FDBA74; }
+.re-unlock-no:hover { background: #FED7AA; }
+
+/* --- Cancelled notice ------------------------------------------------------- */
+
+.re-note {
+    padding: 12px 14px;
+    border-radius: var(--admin-radius-xs);
+    background: var(--admin-bg-subtle);
+    font-size: 0.86rem;
+    color: var(--admin-text-secondary);
+}
+
+/* --- Responsive ------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+    .re-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .re-row { grid-template-columns: minmax(0, 1fr); }
+    .re-bar { left: 0; padding: 12px 16px; flex-wrap: wrap; }
+    .re-head h1 { font-size: 1.5rem; }
+    .re-card { padding: 18px; }
+    .re-fold > summary { padding: 16px 18px; }
+    .re-fold-body { padding: 0 18px 18px; }
+}

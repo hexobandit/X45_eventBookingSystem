@@ -10,16 +10,18 @@
    4. Dashboard (admin/_dashboard.css) - Stats grid, event minis, quick actions
    5. Flask-Admin (admin/_flask-admin.css) - Flask-Admin element overrides
    6. Responsive (admin/_responsive.css) - Admin media queries
+   7. Registration page (admin/_reg-edit.css) - attendee edit layout
 */
 
 /* NOTE: nginx caches /static/ for 30 days (immutable). The ?v= on these
    imports busts that cache — bump the date when you edit a partial. */
-@import 'admin/_variables.css?v=20260919b';
-@import 'admin/_layout.css?v=20260919b';
-@import 'admin/_components.css?v=20260919b';
-@import 'admin/_dashboard.css?v=20260919b';
-@import 'admin/_flask-admin.css?v=20260919b';
-@import 'admin/_responsive.css?v=20260919b';
-@import 'admin/_settings.css?v=20260919b';
-@import 'admin/_manage.css?v=20260919b';
-@import 'admin/_visual-edit.css?v=20260919b';
+@import 'admin/_variables.css?v=20260919c';
+@import 'admin/_layout.css?v=20260919c';
+@import 'admin/_components.css?v=20260919c';
+@import 'admin/_dashboard.css?v=20260919c';
+@import 'admin/_flask-admin.css?v=20260919c';
+@import 'admin/_responsive.css?v=20260919c';
+@import 'admin/_settings.css?v=20260919c';
+@import 'admin/_manage.css?v=20260919c';
+@import 'admin/_visual-edit.css?v=20260919c';
+@import 'admin/_reg-edit.css?v=20260919c';

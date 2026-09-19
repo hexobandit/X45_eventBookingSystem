@@ -1,7 +1,31 @@
 {% extends 'admin/panel_base.html' if request.args.get('panel') else 'admin/master.html' %}
 {% import 'admin/lib.html' as lib with context %}
-{% from 'admin/lib.html' import extra with context %}
 {% set panel_mode = request.args.get('panel') %}
+
+{# One attendee, one page: their own data on the left, what the office did
+   with it on the right, one sticky save bar at the bottom. Every column of
+   the model is rendered somewhere on this page (the rarely used ones inside
+   the folds), because a field that is not rendered is wiped on save. The
+   quick actions write into the real status selects and submit this same
+   form, so all changes go through on_model_change and stay audit-logged. #}
+
+{% macro inp(field) %}
+  {%- set wa = (form_opts.widget_args.get(field.name, {}) if form_opts and form_opts.widget_args else {}) -%}
+  {{ field(**wa) }}
+{%- endmacro %}
+
+{% macro field_row(field, label=None, note=None, hint=None) %}
+  <div class="re-field">
+    <label for="{{ field.id }}">{{ label or field.label.text }}{% if note %} <span class="re-label-note">— {{ note }}</span>{% endif %}</label>
+    {{ inp(field) }}
+    {% if hint %}<p class="re-hint">{{ hint }}</p>{% endif %}
+    {% for err in field.errors %}<p class="re-error">{{ err }}</p>{% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro chip(kind) %}
+  <span class="re-chip {{ kind[0] }}"><span class="ra-icon {{ kind[1] }}"></span>{{ kind[2] }}</span>
+{%- endmacro %}
 
 {% block head %}
   {{ super() }}
@@ -9,260 +33,436 @@
 {% endblock %}
 
 {% block body %}
-  {% block navlinks %}
-  {% if panel_mode %}
-  <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-    <a href="{{ url_for('.edit_view', id=request.args.get('id')) }}" target="_top"
-       style="font-size:0.78rem;">Open full edit page &#8599;</a>
-  </div>
-  {% else %}
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a href="{{ return_url }}" class="nav-link">List</a>
-    </li>
-    <li class="nav-item">
-        <a href="javascript:void(0)" class="nav-link active">Edit</a>
-    </li>
-  </ul>
-  {% endif %}
-  {% endblock %}
+{% set st = model.status.name if model else 'PENDING' %}
+{% set pay = model.payment_status.name if model else 'UNPAID' %}
+{% set status_chip = {'PENDING': ('is-pending', 'ra-clock', 'Awaiting confirmation'),
+                      'CONFIRMED': ('is-confirmed', 'ra-check-circle', 'Confirmed'),
+                      'CANCELLED': ('is-cancelled', 'ra-minus', 'Cancelled'),
+                      'WAITLIST': ('is-waitlist', 'ra-people', 'Waiting list')}[st] %}
+{% set pay_chip = {'PAID': ('is-paid', 'ra-check-circle', 'Paid'),
+                   'REFUNDED': ('is-refunded', 'ra-card', 'Refunded'),
+                   'UNPAID': ('is-unpaid', 'ra-card', 'Unpaid')}[pay] %}
+{% set can_email = model and st != 'CANCELLED' and not panel_mode %}
+{# every field placed by hand below; the rest lands in the safety net fold #}
+{% set placed = ['event', 'first_name', 'last_name', 'email', 'phone', 'organization', 'notes',
+                 'admin_note', 'payment_status', 'payment_method', 'paid_at', 'payment_note',
+                 'billing_name', 'billing_street', 'billing_city', 'billing_zip', 'billing_ico',
+                 'billing_dic', 'stripe_session_id', 'stripe_payment_intent_id', 'status',
+                 'confirmed_at', 'cancelled_at', 'cancellation_reason', 'confirmation_email_sent',
+                 'payment_email_sent', 'payment_email_sent_at', 'reminder_email_sent',
+                 'custom_email_sent', 'custom_email_sent_at', 'gdpr_consent', 'gdpr_consent_date'] %}
 
-  {% if model %}
-  <div class="dash-card" style="margin-bottom: 24px;">
-    <div class="dash-card-header">
-      <h5>{{ model.full_name }} — {{ model.event.title }}</h5>
-    </div>
-    <div style="padding: 16px 24px;">
-      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px;">
-        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-right: 4px;">STATUS:</span>
-        {% if model.status.name == 'PENDING' %}
-          <span class="badge-reg badge-pending">Pending</span>
-        {% elif model.status.name == 'CONFIRMED' %}
-          <span class="badge-reg badge-confirmed">Confirmed</span>
-        {% elif model.status.name == 'CANCELLED' %}
-          <span class="badge-reg badge-cancelled">Cancelled</span>
-        {% elif model.status.name == 'WAITLIST' %}
-          <span class="badge-reg badge-waitlist">Waiting list</span>
-        {% endif %}
-        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-left: 12px; margin-right: 4px;">PAYMENT:</span>
-        {% if model.payment_status.name == 'PAID' %}
-          <span class="badge-reg badge-paid">Paid</span>
-        {% elif model.payment_status.name == 'REFUNDED' %}
-          <span class="badge-reg badge-refunded">Refunded</span>
-        {% else %}
-          <span class="badge-reg badge-unpaid">Unpaid</span>
-        {% endif %}
-        <span style="font-size: 0.78rem; font-weight: 600; color: var(--admin-text-muted); margin-left: 12px; margin-right: 4px;">EMAILS:</span>
-        <div class="email-indicators">
-          <span class="email-indicator {{ 'sent' if model.payment_email_sent else '' }}" title="Payment">
-            {% if model.payment_email_sent %}&#10003;{% else %}&#10005;{% endif %} P
-          </span>
-          <span class="email-indicator {{ 'sent' if model.reminder_email_sent else '' }}" title="Day-before reminder">
-            {% if model.reminder_email_sent %}&#10003;{% else %}&#10005;{% endif %} R
-          </span>
-          <span class="email-indicator {{ 'sent' if model.custom_email_sent else '' }}" title="Custom message">
-            {% if model.custom_email_sent %}&#10003;{% else %}&#10005;{% endif %} C
-          </span>
-        </div>
-      </div>
-      {# Email actions POST to manage_view — in panel mode that would render
-         the whole manage page inside the iframe, so hide them there. #}
-      {% if model.status.name != 'CANCELLED' and not panel_mode %}
-      <div class="actions-cell">
-        <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="action" value="send_confirmation_email">
-          <input type="hidden" name="reg_id" value="{{ model.id }}">
-          <button type="submit" class="btn-action" data-confirm-msg="Send confirmation for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
-            Confirmation
-          </button>
-        </form>
-        {% if model.payment_email_sent %}
-          <span class="btn-action btn-action-done">&#10003; Payment</span>
-        {% else %}
-          <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="action" value="send_payment_email">
-            <input type="hidden" name="reg_id" value="{{ model.id }}">
-            <button type="submit" class="btn-action" data-confirm-msg="Send payment details for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
-              Payment
-            </button>
-          </form>
-        {% endif %}
-        {% if model.reminder_email_sent %}
-          <span class="btn-action btn-action-done">&#10003; Day-before reminder</span>
-        {% else %}
-          <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" style="display:inline">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="action" value="send_reminder_email">
-            <input type="hidden" name="reg_id" value="{{ model.id }}">
-            <button type="submit" class="btn-action" data-confirm-msg="Send the day-before reminder for {{ model.full_name }}?" onclick="return confirmAction(this, this.dataset.confirmMsg)">
-              Day-before reminder
-            </button>
-          </form>
-        {% endif %}
-      </div>
-      {% elif model.status.name == 'CANCELLED' %}
-      <span style="font-size: 0.82rem; color: var(--admin-text-muted);">Registration is cancelled — emails cannot be sent.</span>
+<div class="re-page">
+
+  {# --- Header ----------------------------------------------------------- #}
+  {% if panel_mode %}
+    <a class="re-crumb" href="{{ url_for('.edit_view', id=request.args.get('id')) }}" target="_top">
+      <span class="ra-icon ra-external"></span> Open full edit page
+    </a>
+  {% else %}
+    <p class="re-crumb"><a href="{{ return_url }}"><span class="ra-icon ra-back"></span> Registrations</a>
+      <span class="re-crumb-tail">/ Registration</span></p>
+  {% endif %}
+
+  <div class="re-head">
+    <div>
+      <h1>{{ model.full_name if model else 'Registration' }}</h1>
+      {% if model %}
+      <p class="re-head-sub">
+        <a href="{{ url_for('admin_events.details_view', id=model.event_id) }}"{% if panel_mode %} target="_top"{% endif %}>{{ model.event.title }}</a>
+        {%- if model.variable_symbol %} · VS {{ model.variable_symbol }}{% endif %}
+      </p>
+      <div class="re-chips">{{ chip(status_chip) }}{{ chip(pay_chip) }}</div>
       {% endif %}
     </div>
-  </div>
-  {% endif %}
 
-  {% block edit_form %}
-    <form action="" method="POST" role="form" class="admin-form" enctype="multipart/form-data">
-      <fieldset>
-        {{ lib.render_form_fields(form, form_opts=form_opts) }}
-        <hr>
-        <div class="form-group">
-          <div class="col-md-offset-2 col-md-10 submit-row">
-            <input type="submit" class="btn btn-primary" value="Save" />
-            {% if not panel_mode %}
-            <a href="{{ return_url }}" class="btn btn-secondary" role="button">Back to list</a>
+    {% if model %}
+    <div class="re-head-actions">
+      {% if can_email %}
+      <div class="re-menu" data-menu>
+        <button type="button" class="re-menu-btn" data-menu-btn aria-expanded="false" aria-haspopup="true">
+          <span class="ra-icon ra-mail"></span> Send email <span class="ra-icon ra-caret"></span>
+        </button>
+        <div class="re-menu-list" data-menu-list hidden>
+          <button type="submit" form="sendConfirmationForm"
+                  data-confirm-msg="Send the confirmation email to {{ model.full_name }}?"
+                  onclick="return confirmAction(this, this.dataset.confirmMsg)">Confirmation email</button>
+          <button type="submit" form="sendPaymentForm"
+                  data-confirm-msg="Send the payment details to {{ model.full_name }}?"
+                  onclick="return confirmAction(this, this.dataset.confirmMsg)">Payment details{% if model.payment_email_sent %} (send again){% endif %}</button>
+          <button type="submit" form="sendReminderForm"
+                  data-confirm-msg="Send the day-before reminder to {{ model.full_name }}?"
+                  onclick="return confirmAction(this, this.dataset.confirmMsg)">Day-before reminder{% if model.reminder_email_sent %} (send again){% endif %}</button>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="re-menu" data-menu>
+        <button type="button" class="re-menu-btn" data-menu-btn aria-expanded="false" aria-haspopup="true">
+          More <span class="ra-icon ra-dots"></span>
+        </button>
+        <div class="re-menu-list" data-menu-list hidden>
+          <a href="{{ url_for('admin_events.details_view', id=model.event_id) }}"{% if panel_mode %} target="_top"{% endif %}>Open the course</a>
+          <a href="{{ url_for('admin_events.manage_view', id=model.event_id) }}"{% if panel_mode %} target="_top"{% endif %}>Payments &amp; emails</a>
+          <a href="{{ url_for('admin_email_log.index_view', search=model.email) }}"{% if panel_mode %} target="_top"{% endif %}>Email log for this address</a>
+          {% if admin_view.can_delete and not panel_mode %}
+          <div class="re-menu-sep"></div>
+          <button type="button" class="re-menu-danger"
+                  data-reg-name="{{ model.full_name }}"
+                  onclick="window.openDeleteRegModal(document.getElementById('deleteRegForm'), {name: this.dataset.regName}); return false;">Delete registration</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# --- Form -------------------------------------------------------------- #}
+  <form action="" method="POST" role="form" class="re-form" enctype="multipart/form-data" id="regForm">
+    {% for f in form if f.type in ('CSRFTokenField', 'HiddenField') %}{{ f() }}{% endfor %}
+
+    <div class="re-grid">
+      {# ---------- left column ---------- #}
+      <div>
+        <div class="re-card">
+          <h2>Attendee details</h2>
+          <p class="re-card-sub">Contact and registration information</p>
+
+          {{ field_row(form.event, label='Course') }}
+
+          <div class="re-row">
+            {{ field_row(form.first_name, label='First name') }}
+            {{ field_row(form.last_name, label='Last name') }}
+          </div>
+
+          <div class="re-row">
+            <div class="re-field" data-unlock="email">
+              <div class="re-label-row">
+                <label for="{{ form.email.id }}">Email</label>
+                <button type="button" class="re-edit-btn" data-unlock-btn><span class="ra-icon ra-pencil"></span> Edit</button>
+              </div>
+              {{ inp(form.email) }}
+              {% for err in form.email.errors %}<p class="re-error">{{ err }}</p>{% endfor %}
+            </div>
+            <div class="re-field" data-unlock="phone">
+              <div class="re-label-row">
+                <label for="{{ form.phone.id }}">Phone</label>
+                <button type="button" class="re-edit-btn" data-unlock-btn><span class="ra-icon ra-pencil"></span> Edit</button>
+              </div>
+              {{ inp(form.phone) }}
+              {% for err in form.phone.errors %}<p class="re-error">{{ err }}</p>{% endfor %}
+            </div>
+          </div>
+
+          {{ field_row(form.organization, label='Organization') }}
+          {{ field_row(form.notes, label="Attendee's own note", note='submitted with the registration') }}
+          {{ field_row(form.admin_note, label='Internal notes', note='never shown to the attendee') }}
+        </div>
+
+        <details class="re-card re-fold" open>
+          <summary>
+            <h2>Payment &amp; billing</h2>
+            <span class="re-fold-right">{{ chip(pay_chip) }}<span class="ra-icon ra-caret re-fold-caret"></span></span>
+          </summary>
+          <div class="re-fold-body">
+            <div class="re-row">
+              {{ field_row(form.payment_status, label='Payment status') }}
+              {{ field_row(form.payment_method, label='Payment method') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.paid_at, label='Paid on') }}
+              <div class="re-field">
+                <label for="re-vs">Variable symbol</label>
+                <input type="text" id="re-vs" value="{{ model.variable_symbol or '' }}" readonly
+                       placeholder="Assigned when the registration is created">
+              </div>
+            </div>
+            {{ field_row(form.payment_note, label='Payment note') }}
+            <div class="re-row">
+              {{ field_row(form.billing_name, label='Billing name') }}
+              {{ field_row(form.billing_street, label='Street') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.billing_city, label='City') }}
+              {{ field_row(form.billing_zip, label='ZIP') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.billing_ico, label='Company ID (IČO)') }}
+              {{ field_row(form.billing_dic, label='VAT ID (DIČ)') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.stripe_session_id, label='Stripe session') }}
+              {{ field_row(form.stripe_payment_intent_id, label='Stripe payment intent') }}
+            </div>
+          </div>
+        </details>
+
+        <details class="re-card re-fold">
+          <summary>
+            <h2>Status &amp; dates</h2>
+            <span class="re-fold-right">{{ chip(status_chip) }}<span class="ra-icon ra-caret re-fold-caret"></span></span>
+          </summary>
+          <div class="re-fold-body">
+            <div class="re-row">
+              {{ field_row(form.status, label='Status') }}
+              {{ field_row(form.confirmed_at, label='Confirmed on') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.cancelled_at, label='Cancelled on') }}
+              {{ field_row(form.cancellation_reason, label='Cancellation reason') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.confirmation_email_sent, label='Confirmation email sent') }}
+              {{ field_row(form.payment_email_sent, label='Payment email sent') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.payment_email_sent_at, label='Payment email sent on') }}
+              {{ field_row(form.reminder_email_sent, label='Reminder sent') }}
+            </div>
+            <div class="re-row">
+              {{ field_row(form.custom_email_sent, label='Custom message sent') }}
+              {{ field_row(form.custom_email_sent_at, label='Custom message sent on') }}
+            </div>
+            {# safety net: anything added to the model later still round-trips #}
+            {% set leftovers = form|rejectattr('name', 'in', placed)
+                                   |rejectattr('type', 'in', ['CSRFTokenField', 'HiddenField'])|list %}
+            {% if leftovers %}
+            <div class="re-row">
+              {% for f in leftovers %}{{ field_row(f) }}{% endfor %}
+            </div>
             {% endif %}
           </div>
+        </details>
+
+        <details class="re-card re-fold">
+          <summary>
+            <h2>Consent &amp; privacy</h2>
+            <span class="re-fold-right">
+              {% if model and model.gdpr_consent %}
+              <span class="re-chip is-confirmed"><span class="ra-icon ra-check-circle"></span>Consent recorded</span>
+              {% else %}
+              <span class="re-chip is-refunded"><span class="ra-icon ra-minus"></span>No consent recorded</span>
+              {% endif %}
+              <span class="ra-icon ra-caret re-fold-caret"></span>
+            </span>
+          </summary>
+          <div class="re-fold-body">
+            <div class="re-row">
+              {{ field_row(form.gdpr_consent, label='Consent given') }}
+              {{ field_row(form.gdpr_consent_date, label='Consent date') }}
+            </div>
+            <p class="re-hint">Recorded when the attendee submitted the registration form. Deleting the
+              registration archives both values under Deleted registrations.</p>
+          </div>
+        </details>
+      </div>
+
+      {# ---------- right column ---------- #}
+      <div>
+        <div class="re-card">
+          <h2 class="re-side-title">Registration</h2>
+
+          <div class="re-side-row">
+            <span class="re-side-label">Status</span>
+            {{ chip(status_chip) }}
+          </div>
+          {% if st in ('PENDING', 'WAITLIST') %}
+          <button type="button" class="re-side-btn" data-set-field="status" data-set-value="CONFIRMED">
+            <span class="ra-icon ra-check-circle"></span> Confirm registration</button>
+          <p class="re-side-hint">The attendee can also confirm from their email.</p>
+          {% elif st == 'CONFIRMED' %}
+          <button type="button" class="re-side-btn is-danger" data-set-field="status" data-set-value="CANCELLED">
+            <span class="ra-icon ra-minus"></span> Cancel registration</button>
+          <p class="re-side-hint">Frees the seat. The attendee is not emailed automatically.</p>
+          {% else %}
+          <button type="button" class="re-side-btn" data-set-field="status" data-set-value="PENDING">
+            <span class="ra-icon ra-clock"></span> Reopen as pending</button>
+          <p class="re-side-hint">Takes a seat again if the course still has one.</p>
+          {% endif %}
+
+          <div class="re-divider"></div>
+
+          <div class="re-side-row">
+            <span class="re-side-label">Payment</span>
+            {{ chip(pay_chip) }}
+          </div>
+          {% if pay == 'PAID' %}
+          <button type="button" class="re-side-btn is-danger" data-set-field="payment_status" data-set-value="UNPAID">
+            <span class="ra-icon ra-card"></span> Mark as unpaid</button>
+          <p class="re-side-hint">
+            {%- if model and model.paid_at %}Paid on {{ model.paid_at.strftime('%-d %b %Y, %H:%M') }}
+            {%- if model.payment_method %} · {{ 'Card' if model.payment_method.value == 'card' else 'Bank transfer' }}{% endif %}
+            {%- else %}Recorded as paid.{% endif %}</p>
+          {% else %}
+          <button type="button" class="re-side-btn" data-set-field="payment_status" data-set-value="PAID">
+            <span class="ra-icon ra-card"></span> Record payment</button>
+          <p class="re-side-hint">Card payments are marked automatically by Stripe.</p>
+          {% endif %}
         </div>
-      </fieldset>
-    </form>
-  {% endblock %}
+
+        {% if model %}
+        <div class="re-card">
+          <h2 class="re-side-title">Communication</h2>
+
+          {% set comms = [
+            ('Confirmation email', model.confirmation_email_sent, None, 'Sent', 'Not sent'),
+            ('Attendee confirmed', model.confirmed_at is not none, model.confirmed_at, 'Confirmed', 'Awaiting'),
+            ('Payment request email', model.payment_email_sent, model.payment_email_sent_at, 'Sent', 'Not sent'),
+            ('Day-before reminder', model.reminder_email_sent, None, 'Sent', 'Not sent'),
+            ('Custom message', model.custom_email_sent, model.custom_email_sent_at, 'Sent', 'Not sent')
+          ] %}
+          {% for name, done, when, yes, no in comms %}
+          <div class="re-comm-row">
+            <span class="re-comm-name">{{ name }}</span>
+            <span class="re-comm-state {{ 'is-on' if done }}">
+              <span class="re-dot {{ 'is-on' if done }}"></span>
+              <span>
+                <span class="re-comm-text">{{ yes if done else no }}</span>
+                {% if done and when %}<span class="re-comm-time">{{ when.strftime('%-d %b %Y, %H:%M') }}</span>{% endif %}
+              </span>
+            </span>
+          </div>
+          {% endfor %}
+
+          <a class="re-card-link" href="{{ url_for('admin_email_log.index_view', search=model.email) }}"{% if panel_mode %} target="_top"{% endif %}>
+            View activity history <span aria-hidden="true">&rarr;</span>
+          </a>
+
+          {% if model.status.name == 'CANCELLED' %}
+          <p class="re-note">Registration is cancelled — emails cannot be sent.</p>
+          {% elif panel_mode %}
+          <p class="re-note">Open the full edit page to send emails.</p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# --- Sticky save bar ------------------------------------------------- #}
+    <div class="re-bar">
+      <span class="re-dirty" id="reDirty">No unsaved changes</span>
+      <div class="re-bar-actions">
+        {% if not panel_mode %}
+        <a class="re-btn-cancel" href="{{ return_url }}">Cancel</a>
+        {% endif %}
+        <button type="submit" class="re-btn-save">Save changes</button>
+      </div>
+    </div>
+  </form>
+
+  {# --- Out-of-form helpers (HTML forbids nested forms) ------------------- #}
+  {% if can_email %}
+  {% for action, form_id in [('send_confirmation_email', 'sendConfirmationForm'),
+                             ('send_payment_email', 'sendPaymentForm'),
+                             ('send_reminder_email', 'sendReminderForm')] %}
+  <form method="POST" action="{{ url_for('admin_events.manage_view', id=model.event_id) }}" id="{{ form_id }}" hidden>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="{{ action }}">
+    <input type="hidden" name="reg_id" value="{{ model.id }}">
+  </form>
+  {% endfor %}
+  {% endif %}
 
   {% if admin_view.can_delete and not panel_mode %}
   {% block delete_section %}
-    <div class="delete-zone">
-      <h4>Delete registration</h4>
-      <p>The registration is removed from the course and archived under <strong>Deleted registrations</strong>
-         (with your reason). You can choose to notify the participant by email.</p>
-      <form method="POST" action="{{ get_url('.delete_view') }}" id="deleteRegForm">
-        <input type="hidden" name="id" value="{{ request.args.get('id') }}" />
-        <input type="hidden" name="url" value="{{ return_url }}" />
-        {% if csrf_token is defined and csrf_token %}
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        {% endif %}
-        <button type="submit" class="btn btn-danger"
-                data-reg-name="{{ model.full_name if model else '' }}"
-                onclick="window.openDeleteRegModal(this.form, {name: this.dataset.regName}); return false;">
-          Delete registration
-        </button>
-      </form>
-    </div>
-    {% include 'admin/_delete_registration_modal.html' %}
+  <form method="POST" action="{{ get_url('.delete_view') }}" id="deleteRegForm" hidden>
+    <input type="hidden" name="id" value="{{ request.args.get('id') }}" />
+    <input type="hidden" name="url" value="{{ return_url }}" />
+    {% if csrf_token is defined and csrf_token %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {% endif %}
+  </form>
+  {% include 'admin/_delete_registration_modal.html' %}
   {% endblock %}
   {% endif %}
+
+</div>
 {% endblock %}
 
 {% block tail %}
   {{ super() }}
   {{ lib.form_js() }}
-  <style>
-    .field-unlock-btn {
-      display: inline-block;
-      margin-left: 8px;
-      padding: 2px 8px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--admin-text-muted);
-      background: transparent;
-      border: 1px solid var(--admin-border-medium);
-      border-radius: 4px;
-      cursor: pointer;
-      vertical-align: middle;
-    }
-    .field-unlock-btn:hover {
-      color: var(--brand-primary);
-      border-color: var(--brand-primary);
-    }
-    .field-unlock-confirm {
-      margin-top: 8px;
-      padding: 10px 14px;
-      background: #FFF7ED;
-      border: 1px solid #FDBA74;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      color: #9A3412;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .field-unlock-confirm span {
-      flex: 1;
-      min-width: 180px;
-    }
-    .field-unlock-confirm .btn-unlock-yes {
-      padding: 3px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: #EA580C;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .field-unlock-confirm .btn-unlock-yes:hover {
-      background: #C2410C;
-    }
-    .field-unlock-confirm .btn-unlock-no {
-      padding: 3px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: transparent;
-      color: #9A3412;
-      border: 1px solid #FDBA74;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .field-unlock-confirm .btn-unlock-no:hover {
-      background: #FED7AA;
-    }
-  </style>
   <script>
-  (function() {
-    var fields = [
-      { name: 'email', label: 'email address', warning: 'Changing the email will affect all future communication with the participant.' },
-      { name: 'phone', label: 'phone number', warning: 'Changing the phone number will be reflected in the registration details.' }
-    ];
-    fields.forEach(function(f) {
-      var input = document.getElementById(f.name);
-      if (!input) return;
+  (function () {
+    var form = document.getElementById('regForm');
+    if (!form) return;
 
-      var wrapper = input.closest('.col-md-10') || input.parentNode;
+    /* Dropdown menus (Send email / More) */
+    function closeMenus() {
+      document.querySelectorAll('[data-menu-list]').forEach(function (l) { l.hidden = true; });
+      document.querySelectorAll('[data-menu-btn]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    }
+    document.querySelectorAll('[data-menu]').forEach(function (menu) {
+      var btn = menu.querySelector('[data-menu-btn]');
+      var list = menu.querySelector('[data-menu-list]');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = list.hidden;
+        closeMenus();
+        list.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
+    document.addEventListener('click', closeMenus);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenus(); });
 
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'field-unlock-btn';
-      btn.textContent = 'Edit';
-      btn.title = 'Unlock field for editing';
+    /* Save bar: idle until something actually changes */
+    var dirty = document.getElementById('reDirty');
+    var isDirty = false;
+    function markDirty() {
+      if (isDirty) return;
+      isDirty = true;
+      if (dirty) { dirty.textContent = 'Unsaved changes'; dirty.classList.add('is-dirty'); }
+    }
+    form.addEventListener('input', markDirty);
+    form.addEventListener('change', markDirty);
+    window.addEventListener('beforeunload', function (e) {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    });
+    form.addEventListener('submit', function () { isDirty = false; });
 
-      var confirmBox = null;
+    /* Quick actions write into the real select, then save */
+    form.querySelectorAll('[data-set-field]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var select = form.querySelector('[name="' + btn.dataset.setField + '"]');
+        if (!select) return;
+        select.value = btn.dataset.setValue;
+        if (window.setLoading) window.setLoading(btn);
+        isDirty = false;
+        form.submit();
+      });
+    });
 
-      btn.addEventListener('click', function() {
-        if (confirmBox) return;
+    /* Email and phone stay locked until the admin confirms the change */
+    [{ name: 'email', label: 'email address', warning: 'Changing the email affects all future communication with the attendee.' },
+     { name: 'phone', label: 'phone number', warning: 'The phone number is used for last-minute calls before the course.' }
+    ].forEach(function (f) {
+      var wrapper = form.querySelector('[data-unlock="' + f.name + '"]');
+      var input = wrapper && wrapper.querySelector('input');
+      var btn = wrapper && wrapper.querySelector('[data-unlock-btn]');
+      if (!input || !btn) return;
+      if (!input.hasAttribute('readonly')) { btn.remove(); return; }
 
-        confirmBox = document.createElement('div');
-        confirmBox.className = 'field-unlock-confirm';
-        confirmBox.innerHTML =
-          '<span>' + f.warning + ' Do you really want to change the ' + f.label + '?</span>' +
-          '<button type="button" class="btn-unlock-yes">Yes, edit</button>' +
-          '<button type="button" class="btn-unlock-no">Cancel</button>';
-
-        wrapper.appendChild(confirmBox);
-
-        confirmBox.querySelector('.btn-unlock-yes').addEventListener('click', function() {
+      btn.addEventListener('click', function () {
+        if (wrapper.querySelector('.re-unlock-confirm')) return;
+        var box = document.createElement('div');
+        box.className = 're-unlock-confirm';
+        box.innerHTML = '<span>' + f.warning + ' Change the ' + f.label + '?</span>' +
+                        '<button type="button" class="re-unlock-yes">Yes, change</button>' +
+                        '<button type="button" class="re-unlock-no">Cancel</button>';
+        wrapper.appendChild(box);
+        box.querySelector('.re-unlock-yes').addEventListener('click', function () {
           input.removeAttribute('readonly');
-          input.style.background = '#fff';
+          input.style.background = '';
           input.style.pointerEvents = 'auto';
           input.focus();
-          confirmBox.remove();
+          box.remove();
           btn.remove();
         });
-
-        confirmBox.querySelector('.btn-unlock-no').addEventListener('click', function() {
-          confirmBox.remove();
-          confirmBox = null;
-        });
+        box.querySelector('.re-unlock-no').addEventListener('click', function () { box.remove(); });
       });
-
-      wrapper.appendChild(btn);
     });
   })();
   </script>
