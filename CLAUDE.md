@@ -61,6 +61,17 @@ Tests use `create_app('testing')`: in-memory SQLite, CSRF off, `EMAIL_ASYNC=Fals
 
 **Inquiries** (`Inquiry`, `InquiryType`): the enum values `book_order` / `book_notify` are legacy names kept for DB compatibility; the admin labels them "Order interest" / "Notify list". No public form currently creates them (the client-specific book pages were removed); the admin views and batch email remain as a product feature.
 
+## Tooling in this repo
+
+`.claude/` carries the project's own helpers, all checked in:
+
+- **`screenshot` skill** → `scripts/shoot.py`. Screenshots any page, admin ones included: it renders through the test client (logged in, static paths rewritten) and drives headless Chrome with a watchdog. `--live` shoots a running server instead. Never hand-roll Chrome commands; it hangs and macOS has no `timeout`.
+- **`demo-qa` skill** → `scripts/qa_demo.py`. Crawls every public and admin page for 500s and leaked client branding, and with `--demo` asserts the demo-mode promises. Exits non-zero, so it works as a pre-deploy gate.
+- **`port-from-client` skill**: the merge-base recipe for bringing client-site work into the product without reverting product changes.
+- **`new-client-site`** and **`client-offer`** skills: launching an instance for a client, and drafting the Czech quote from the internal price list.
+- **`admin-ui-reviewer` agent**: reviews admin template, CSS and view diffs against the rules below, data-loss ones first.
+- **Hooks** (`.claude/hooks/guard.py`, wired in `.claude/settings.json`): refuse edits to the client repo, the read-only reference copy, `nono/`, `instance/` and `.env`; and after a stylesheet partial changes, check that its `?v=` in the matching index was bumped today.
+
 ## Conventions and gotchas
 
 - CSS is split into partials imported by `static/css/style.css` (public) and `static/css/admin.css` (admin); `base.html` links the public partials directly with `?v={{ asset_v }}`. nginx caches `/static/` for 30 days, so bump the `?v=` date on the `@import` lines when editing an admin partial. Public tokens in `_variables.css` (light theme; `--light`/`--light-soft` are the amber light colours, never used for buttons); admin tokens in `admin/_variables.css` (same daylight blue as the public site). The home hero (`index.html`, hero block in `_pages.css`, last section of `main.js`) is the interactive "cursor is the key light" scene: JS writes `--lx`/`--ly` on `#hero`, CSS derives the light pool, sphere highlight, cast shadow and headline shadow; modifier chips set `data-mod`. Touch devices get a CSS orbit animation, reduced motion a static lamp. Sentence-case labels everywhere; no uppercase micro-type.
